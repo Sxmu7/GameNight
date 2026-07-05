@@ -9,6 +9,18 @@ const SUITS = [
   { s: '♦', c: 'red' },
 ];
 const RANK_LABEL = r => (r <= 10 ? String(r) : ({ 11: 'J', 12: 'Q', 13: 'K', 14: 'A' })[r]);
+const SUIT_NAME = {
+  de: { '♠': 'Pik', '♥': 'Herz', '♦': 'Karo', '♣': 'Kreuz' },
+  en: { '♠': 'Spades', '♥': 'Hearts', '♦': 'Diamonds', '♣': 'Clubs' },
+};
+const RANK_WORD = {
+  de: { 11: 'Bube', 12: 'Dame', 13: 'König', 14: 'Ass' },
+  en: { 11: 'Jack', 12: 'Queen', 13: 'King', 14: 'Ace' },
+};
+function cardName(card, lang) {
+  const r = RANK_WORD[lang][card.rank] || String(card.rank);
+  return lang === 'de' ? `${SUIT_NAME.de[card.suit]} ${r}` : `${r} of ${SUIT_NAME.en[card.suit]}`;
+}
 
 /* ---------------- KING'S CUP RULES ---------------- */
 const KC_RULES = {
@@ -177,6 +189,7 @@ const RULEBOOK = {
     { title: '👍 Daumenkönig', body: 'Ein Spieler ist Daumenkönig und legt irgendwann unauffällig den Daumen auf den Tisch. Alle müssen nachziehen — der Letzte trinkt.' },
     { title: '✦ Wer würde eher', body: 'Eine Frage wird vorgelesen ("Wer würde eher …?"). Alle zeigen gleichzeitig auf die Person, die am ehesten zutrifft — wer in der Minderheit landet (oder am häufigsten gezeigt wird), trinkt.' },
     { title: '📜 Beliebte Zusatzregeln', body: 'Neue Regel: Wer einen Buben zieht, darf eine neue Regel festlegen.\nSchimpfwörter verboten · Namen verboten · Handy benutzen verboten · Lachen bei bestimmten Aktionen verboten.' },
+    { title: '🂡 Anlegen (High · Low · Same)', body: 'Drei Stapel liegen offen aus. Der aktive Stapel zeigt eine Karte — du rätst, ob die nächste Karte höher oder tiefer liegt. Bei Gleichstand: Push, nochmal. Bei 3 richtigen in Folge kannst du den Stapel "abgeben" (Sieg + neue Karte) oder mit ⚡ Extreme doppelt pokern. Falsch geraten = trinken, der Stapel wird neu gemischt.' },
     { title: '⚠️ Hinweis', body: 'Bitte verantwortungsvoll spielen. Niemand sollte zum Trinken gedrängt werden — alle Spiele funktionieren auch mit alkoholfreien Getränken.' },
   ],
   en: [
@@ -192,6 +205,7 @@ const RULEBOOK = {
     { title: '👍 Thumb Master', body: 'One player is Thumb Master and quietly puts a thumb on the table at any point — everyone follows. Last one drinks.' },
     { title: '✦ Most Likely To', body: 'A prompt is read aloud ("Who would be most likely to …?"). Everyone points at the person they think fits — whoever gets pointed at most (or ends up in the minority) drinks.' },
     { title: '📜 Popular House Rules', body: 'New rule: whoever draws a jack may set a new rule.\nNo swearing · no first names · no phones · no laughing at certain actions.' },
+    { title: '🂡 Anlegen (High · Low · Same)', body: 'Three piles lie face up. The active pile shows a card — guess whether the next one is higher or lower. A tie is a push, redraw. Get 3 correct in a row and you can cash in the pile (win + fresh card) or push your luck with ⚡ Extreme for double. Wrong guess = drink, and the pile reshuffles.' },
     { title: '⚠️ Please Note', body: 'Play responsibly. No one should be pressured to drink — every game also works with non-alcoholic drinks.' },
   ],
 };
@@ -208,7 +222,9 @@ const I18N = {
     higher: 'Höher', lower: 'Tiefer', red: 'Rot', black: 'Schwarz', inside: 'Innen', outside: 'Außen',
     streak: 'Serie', best: 'Rekord', drinksLabel: 'Schlucke', newRound: 'Neue Runde', nextPlayer: 'Nächster Spieler',
     loadingMsgs: ['Karten werden gemischt…', 'Deck wird ausgeteilt…', 'Tisch wird gedeckt…'],
+    preparing: 'bereitet vor…',
     backAria: 'Zurück', ready: 'Bereit',
+    navHome: 'Home', navRules: 'Regeln', turnLabel: 'Am Zug',
     modes: {
       kings: { title: "King's Cup", desc: 'Volles Deck — jede Karte hat eine eigene Regel' },
       bus: { title: 'Busfahrer', desc: '3 Phasen: Fragen, Pyramide, die Kartenstraße' },
@@ -219,6 +235,14 @@ const I18N = {
       mostlikely: { title: 'Wer würde eher', desc: 'Zeigt auf die passendste Person' },
       party: { title: 'Party-Prompts', desc: 'Kategorien, Reime, Fragemeister & mehr' },
       mix: { title: 'Mix-Modus', desc: 'Zufällige Mischung aus allem' },
+      anlegen: { title: 'Anlegen', desc: 'High · Low · Same — 3 Stapel, ein Deck' },
+    },
+    anlegen: {
+      pile: 'Stapel', card1: 'Karte', cardN: 'Karten', longest: 'längste', active: 'aktiv',
+      streak: 'Serie', deck: 'Deck', where: 'Wo anlegen?', left: '← Links', right: '→ Rechts',
+      bank: n => `Abgeben ab ${n}`, extreme: '⚡ Extreme', classic: 'KLASSISCH',
+      banked: 'Abgegeben — Stapel gewonnen!', busted: n => `Falsch — ${n}× trinken`,
+      wins: 'Siege',
     },
     bus: {
       phaseNames: ['Rot oder Schwarz', 'Höher oder Tiefer', 'Innen oder Außen', 'Farbe raten'],
@@ -237,7 +261,7 @@ const I18N = {
       intro: 'Der digitale Kartenstapel für deinen Abend: King\'s Cup, Busfahrer, Wer würde eher und mehr — animiert, minimalistisch, sofort startklar.',
       cta: 'Los geht\'s →',
       features: [
-        { icon: '🃏', label: '9 Spiele' },
+        { icon: '🃏', label: '10 Spiele' },
         { icon: '🌍', label: 'DE & EN' },
         { icon: '⚡', label: 'Kein Setup' },
       ],
@@ -253,7 +277,9 @@ const I18N = {
     higher: 'Higher', lower: 'Lower', red: 'Red', black: 'Black', inside: 'Inside', outside: 'Outside',
     streak: 'Streak', best: 'Best', drinksLabel: 'Drinks', newRound: 'New Round', nextPlayer: 'Next Player',
     loadingMsgs: ['Shuffling the deck…', 'Dealing the cards…', 'Setting the table…'],
+    preparing: 'preparing…',
     backAria: 'Back', ready: 'Ready',
+    navHome: 'Home', navRules: 'Rules', turnLabel: 'Your Turn',
     modes: {
       kings: { title: "King's Cup", desc: 'Full deck — every card triggers its own rule' },
       bus: { title: 'Ride the Bus', desc: '3 phases: questions, pyramid, the bus' },
@@ -264,6 +290,14 @@ const I18N = {
       mostlikely: { title: 'Most Likely To', desc: 'Point at whoever fits the prompt best' },
       party: { title: 'Party Prompts', desc: 'Categories, rhymes, question master & more' },
       mix: { title: 'Mix Mode', desc: 'Random blend of everything' },
+      anlegen: { title: 'Anlegen', desc: 'High · Low · Same — 3 piles, one deck' },
+    },
+    anlegen: {
+      pile: 'Pile', card1: 'card', cardN: 'cards', longest: 'longest', active: 'active',
+      streak: 'Streak', deck: 'Deck', where: 'Which way?', left: '← Lower', right: '→ Higher',
+      bank: n => `Cash in from ${n}`, extreme: '⚡ Extreme', classic: 'CLASSIC',
+      banked: 'Cashed in — pile won!', busted: n => `Wrong — drink ${n}×`,
+      wins: 'Wins',
     },
     bus: {
       phaseNames: ['Red or Black', 'Higher or Lower', 'Inside or Outside', 'Guess the Suit'],
@@ -282,7 +316,7 @@ const I18N = {
       intro: "The digital deck for your next get-together: King's Cup, Ride the Bus, Most Likely To and more — animated, minimal, ready in seconds.",
       cta: "Let's go →",
       features: [
-        { icon: '🃏', label: '9 games' },
+        { icon: '🃏', label: '10 games' },
         { icon: '🌍', label: 'DE & EN' },
         { icon: '⚡', label: 'Zero setup' },
       ],

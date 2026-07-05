@@ -8,7 +8,8 @@ let players = JSON.parse(localStorage.getItem('cp_players') || '[]');
 let currentPlayerIndex = 0;
 let deck = [];
 let mode = null;
-const ICONS = { kings: '♛', bus: '▤', streak: '↗', redblack: '◐', dealer: '♣', akqj: '♦', mostlikely: '✦', party: '✺', mix: '⟳' };
+let uiBusy = false;
+const ICONS = { kings: '♛', bus: '▤', streak: '↗', redblack: '◐', dealer: '♣', akqj: '♦', mostlikely: '✦', party: '✺', mix: '⟳', anlegen: '🂡' };
 
 /* ---------------- CORE HELPERS ---------------- */
 function T() { return I18N[LANG]; }
@@ -25,7 +26,7 @@ function draw() {
   if (deck.length === 0) { deck = shuffle(buildDeck()); showToast(T().deckReshuffled); }
   return deck.pop();
 }
-function currentPlayer() { return players.length ? players[currentPlayerIndex] : { name: T().ready, drinks: 0 }; }
+function currentPlayer() { return players.length ? players[currentPlayerIndex] : { name: T().ready, drinks: 0, wins: 0 }; }
 function advanceTurn() { if (players.length) currentPlayerIndex = (currentPlayerIndex + 1) % players.length; renderTurnBadge(); }
 function renderTurnBadge() { const el = document.getElementById('turnBadge'); if (el) el.textContent = currentPlayer().name; }
 function addDrink(n = 1, idx = null) {
@@ -35,6 +36,19 @@ function addDrink(n = 1, idx = null) {
   players[i].drinks = (players[i].drinks || 0) + n;
   savePlayers();
   floatPlus('+' + n);
+}
+function addWin(idx) {
+  if (!players.length || idx < 0 || idx >= players.length) return;
+  players[idx].wins = (players[idx].wins || 0) + 1;
+  savePlayers();
+}
+function playerStatsHTML(highlightIdx) {
+  if (!players.length) return `<div class="empty-hint">${T().playersEmpty}</div>`;
+  return `<div class="statGrid">${players.map((p, i) => `
+    <div class="statCard ${i === highlightIdx ? 'current' : ''}">
+      <div class="nm">${p.name}</div>
+      <div class="row"><span>🏆 ${p.wins || 0}</span><span>🍺 ${p.drinks || 0}</span></div>
+    </div>`).join('')}</div>`;
 }
 function floatPlus(text) {
   const el = document.createElement('div');
@@ -53,7 +67,8 @@ function showToast(msg) {
 }
 function cardFaceHTML(card) {
   const cls = card.color === 'red' ? 'red' : '';
-  return `<div class="rankBig ${cls}">${RANK_LABEL(card.rank)}</div><div class="suitBig ${cls}">${card.suit}</div>`;
+  const r = RANK_LABEL(card.rank);
+  return `<div class="cardCorner tl ${cls}">${r}<span>${card.suit}</span></div><div class="cardCorner br ${cls}">${r}<span>${card.suit}</span></div>`;
 }
 /* shared guess evaluator — kind: 0 color, 1 higher/lower vs refs[0], 2 inside/outside vs refs[0..1], 3 exact suit */
 function evaluateGuess(kind, guess, card, refs) {
@@ -76,7 +91,7 @@ function addPlayer() {
   const inp = document.getElementById('playerInput');
   const name = inp.value.trim();
   if (!name) return;
-  players.push({ name, drinks: 0 });
+  players.push({ name, drinks: 0, wins: 0 });
   inp.value = '';
   savePlayers(); renderChips(); vib();
 }
@@ -100,6 +115,10 @@ function renderTopbar() {
   document.getElementById('gamesLabel').textContent = T().gamesLabel;
   document.getElementById('rulesLinkTxt').textContent = T().rulesLabel;
   document.querySelectorAll('.langToggle button').forEach(b => b.classList.toggle('on', b.dataset.lang === LANG));
+  ['navHomeTxt', 'navHomeTxt2'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = T().navHome; });
+  const nr = document.getElementById('navRulesTxt'); if (nr) nr.textContent = T().navRules;
+  const tl = document.getElementById('turnLabel'); if (tl) tl.textContent = T().turnLabel;
+  const rt = document.getElementById('rulesTitle'); if (rt) rt.textContent = T().rulesLabel;
 }
 function renderLanding() {
   const l = T().landing;
@@ -114,7 +133,7 @@ function enterApp() {
 }
 
 /* ---------------- MODE LIST ---------------- */
-const MODE_IDS = ['kings', 'bus', 'streak', 'redblack', 'dealer', 'akqj', 'mostlikely', 'party', 'mix'];
+const MODE_IDS = ['anlegen', 'kings', 'bus', 'streak', 'redblack', 'dealer', 'akqj', 'mostlikely', 'party', 'mix'];
 function renderModeGrid() {
   document.getElementById('modeGrid').innerHTML = MODE_IDS.map(id => {
     const m = T().modes[id];
@@ -144,6 +163,8 @@ function goGame(title) {
 function goRules() {
   renderRules();
   document.getElementById('screen-home').classList.remove('active');
+  document.getElementById('screen-game').classList.remove('active');
+  document.getElementById('screen-landing').classList.remove('active');
   document.getElementById('screen-rules').classList.add('active');
 }
 
@@ -151,7 +172,10 @@ function goRules() {
 function startMode(id) {
   vib();
   const overlay = document.getElementById('loadOverlay');
-  document.getElementById('loadText').textContent = T().loadingMsgs[Math.floor(Math.random() * T().loadingMsgs.length)];
+  const randomCard = { rank: 2 + Math.floor(Math.random() * 13), suit: SUITS[Math.floor(Math.random() * 4)].s };
+  randomCard.color = (randomCard.suit === '♥' || randomCard.suit === '♦') ? 'red' : 'black';
+  document.getElementById('loadHeadline').textContent = cardName(randomCard, LANG).toUpperCase();
+  document.getElementById('loadSub').textContent = T().preparing;
   overlay.classList.add('show');
   setTimeout(() => {
     mode = id;
@@ -171,6 +195,7 @@ function dispatchInit(id) {
   if (id === 'mostlikely') { goGame(m.title); initMostLikely(); }
   if (id === 'party') { goGame(m.title); initParty(); }
   if (id === 'mix') { goGame(m.title); initMix(); }
+  if (id === 'anlegen') { goGame(m.title); initAnlegen(); }
 }
 
 /* ================= KING'S CUP ================= */
@@ -245,18 +270,20 @@ function renderBusPhase1() {
     </div>`;
 }
 function busGuess(guess) {
+  if (uiBusy) return; uiBusy = true;
   const card = draw();
   document.getElementById('busFront').innerHTML = cardFaceHTML(card);
   document.getElementById('busCard').classList.add('flipped'); vib(15);
   const result = evaluateGuess(busQIdx, guess, card, busRefs);
   setTimeout(() => {
     const fb = document.getElementById('busFeedback');
-    if (result === null) { fb.textContent = T().push; fb.className = 'feedback show'; setTimeout(renderBusPhase1, 1100); return; }
+    if (result === null) { fb.textContent = T().push; fb.className = 'feedback show'; setTimeout(() => { uiBusy = false; renderBusPhase1(); }, 1100); return; }
     const bp = busPlayers[busPlayerIdx];
     if (result) { fb.textContent = T().correct; fb.className = 'feedback show ok'; }
     else { fb.textContent = T().wrong; fb.className = 'feedback show bad'; bp.mistakes++; if (bp.i >= 0) addDrink(1, bp.i); }
     busRefs.push(card);
     setTimeout(() => {
+      uiBusy = false;
       busQIdx++;
       if (busQIdx >= 4) { busQIdx = 0; busRefs = []; busPlayerIdx++; }
       if (busPlayerIdx >= busPlayers.length) renderBusSummary();
@@ -337,6 +364,7 @@ function renderBusFinal(feedback) {
     </div>`;
 }
 function busFinalGuess(guess) {
+  if (uiBusy) return; uiBusy = true;
   const next = draw();
   document.getElementById('bfFront').innerHTML = cardFaceHTML(next);
   document.getElementById('bfCard').classList.add('flipped'); vib(15);
@@ -344,6 +372,7 @@ function busFinalGuess(guess) {
   if (next.rank === busFinalCard.rank) result = null;
   else result = ((guess === 'higher' && next.rank > busFinalCard.rank) || (guess === 'lower' && next.rank < busFinalCard.rank));
   setTimeout(() => {
+    uiBusy = false;
     if (result === null) { busFinalCard = next; renderBusFinal({ cls: '', text: T().push }); return; }
     if (result) {
       busFinalIdx++; busFinalCard = next;
@@ -440,11 +469,13 @@ function renderDealer(feedback) {
     </div>`;
 }
 function fdGuess(guess) {
+  if (uiBusy) return; uiBusy = true;
   const card = draw();
   document.getElementById('fdFront').innerHTML = cardFaceHTML(card);
   document.getElementById('fdCard').classList.add('flipped'); vib(15);
   const result = evaluateGuess(fdSubIdx, guess, card, fdRefs);
   setTimeout(() => {
+    uiBusy = false;
     if (result === null) { renderDealer({ cls: '', text: T().push }); return; }
     if (result) {
       if (fdDealerIdx >= 0) addDrink(1, fdDealerIdx);
@@ -592,6 +623,7 @@ function mixChallenge(kind) {
     </div>`;
 }
 function mixGuess(kind, guess) {
+  if (uiBusy) return; uiBusy = true;
   const card = draw();
   document.getElementById('mixFront').innerHTML = cardFaceHTML(card);
   document.getElementById('mixCard').classList.add('flipped'); vib(15);
@@ -602,8 +634,90 @@ function mixGuess(kind, guess) {
     const fb = document.getElementById('mixFeedback');
     if (correct) { fb.textContent = T().correct; fb.className = 'feedback show ok'; }
     else { fb.textContent = T().wrong; fb.className = 'feedback show bad'; addDrink(1); }
-    setTimeout(() => { advanceTurn(); mixRound(); }, 1100);
+    setTimeout(() => { uiBusy = false; advanceTurn(); mixRound(); }, 1100);
   }, 300);
+}
+
+/* ================= ANLEGEN (High / Low / Same, 3 piles) ================= */
+let anPiles, anActive, anExtreme;
+function initAnlegen() {
+  anPiles = [0, 1, 2].map(() => ({ card: draw(), streak: 0 }));
+  anActive = 0; anExtreme = false;
+  renderAnlegen();
+}
+function renderAnlegen(feedback) {
+  const az = T().anlegen;
+  const maxStreak = Math.max(...anPiles.map(p => p.streak));
+  const pilesHTML = anPiles.map((p, i) => `
+    <div class="pileBox ${i === anActive ? 'active' : ''}" onclick="anSelect(${i})">
+      ${i === anActive ? `<div class="pileActiveTag">${az.active}</div>` : ''}
+      <div class="pileHead">
+        <h3>${az.pile} ${i + 1}</h3>
+        <span class="pileSub">${p.streak} ${p.streak === 1 ? az.card1 : az.cardN}${p.streak > 0 && p.streak === maxStreak ? ' · ' + az.longest : ''}</span>
+      </div>
+      <div class="pileCardWrap"><div class="pileMiniCard">${cardFaceHTML(p.card)}</div></div>
+    </div>`).join('');
+  const active = anPiles[anActive];
+  const canBank = active.streak >= 3;
+
+  document.getElementById('gameBody').innerHTML = `
+    <div class="scene">
+      ${playerStatsHTML(currentPlayerIndex)}
+      <div class="pileList">${pilesHTML}</div>
+      <div class="statusBar">
+        <div class="classicTag">${az.classic}</div>
+        <div class="statusRow"><span>${az.streak}: <b>${active.streak}/3</b></span><span>🍺 <b>${currentPlayer().name}</b></span><span>${az.deck}: <b>${deck.length}</b></span></div>
+        <div class="whereQ">${az.where}</div>
+        <div class="feedback ${feedback ? ('show ' + feedback.cls) : ''}">${feedback ? feedback.text : ''}</div>
+        <div class="btnRow">
+          <button class="btn primary" onclick="anGuess('left')">${az.left}</button>
+          <button class="btn primary" onclick="anGuess('right')">${az.right}</button>
+        </div>
+        <div class="btnRow">
+          <button class="btn dark-out" ${canBank ? '' : 'disabled'} onclick="anBank()">${az.bank(3)}</button>
+          <button class="btn ${anExtreme ? 'primary' : 'dark-out'}" ${canBank ? '' : 'disabled'} onclick="anToggleExtreme()">${az.extreme}</button>
+        </div>
+      </div>
+    </div>`;
+}
+function anSelect(i) { anActive = i; renderAnlegen(); }
+function anGuess(dir) {
+  const pile = anPiles[anActive];
+  const card = draw();
+  vib(15);
+  let result;
+  if (card.rank === pile.card.rank) result = null;
+  else result = (dir === 'right' && card.rank > pile.card.rank) || (dir === 'left' && card.rank < pile.card.rank);
+  if (result === null) { pile.card = card; renderAnlegen({ cls: '', text: T().push }); return; }
+  if (result) {
+    pile.streak++; pile.card = card;
+    renderAnlegen({ cls: 'ok', text: T().correct + ' — ' + T().anlegen.streak + ' ' + pile.streak });
+  } else {
+    const penalty = anExtreme ? 2 : 1;
+    addDrink(penalty);
+    pile.streak = 0; pile.card = card; anExtreme = false;
+    advanceTurn();
+    anActive = (anActive + 1) % anPiles.length;
+    renderAnlegen({ cls: 'bad', text: T().anlegen.busted(penalty) });
+  }
+}
+function anBank() {
+  const pile = anPiles[anActive];
+  if (pile.streak < 3) return;
+  vib(20);
+  addWin(currentPlayerIndex);
+  if (anExtreme) addWin(currentPlayerIndex);
+  floatPlus('🏆');
+  anPiles[anActive] = { card: draw(), streak: 0 };
+  anExtreme = false;
+  advanceTurn();
+  anActive = (anActive + 1) % anPiles.length;
+  renderAnlegen({ cls: 'ok', text: T().anlegen.banked });
+}
+function anToggleExtreme() {
+  if (anPiles[anActive].streak < 3) return;
+  anExtreme = !anExtreme;
+  renderAnlegen();
 }
 
 /* ================= RULES REFERENCE ================= */

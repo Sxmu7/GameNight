@@ -14,7 +14,7 @@
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -73,20 +73,26 @@
 
   <!-- GAME -->
   <div class="screen" id="screen-game">
+    <div class="navRow">
+      <button class="navPill" onclick="goHome()">🏠 <span id="navHomeTxt">Home</span></button>
+      <button class="navPill" onclick="goRules()">📖 <span id="navRulesTxt">Rules</span></button>
+    </div>
     <div class="gheader">
-      <div class="back-btn" onclick="goHome()">←</div>
-      <h2 id="gameTitle">Mode</h2>
-      <div class="turn-badge"><span class="turn-dot"></span><span id="turnBadge">—</span></div>
+      <div class="turnBlock">
+        <div class="turnLabel" id="turnLabel">TURN</div>
+        <h2 class="turnName">🍺 <span id="turnBadge">—</span></h2>
+      </div>
+      <h2 class="modeTag" id="gameTitle">Mode</h2>
     </div>
     <div class="gbody" id="gameBody"></div>
   </div>
 
   <!-- RULES -->
   <div class="screen" id="screen-rules">
-    <div class="gheader">
-      <div class="back-btn" onclick="goHome()">←</div>
-      <h2 id="rulesTitle">How to play</h2>
+    <div class="navRow">
+      <button class="navPill" onclick="goHome()">🏠 <span id="navHomeTxt2">Home</span></button>
     </div>
+    <h2 id="rulesTitle" class="modeTag" style="margin-bottom:14px;">How to play</h2>
     <div class="accordion" id="rulesBody"></div>
   </div>
 
@@ -95,15 +101,10 @@
 <div class="toast" id="toast"></div>
 
 <div class="loadOverlay" id="loadOverlay">
-  <div class="loadDeck">
-    <div class="loadCard"></div>
-    <div class="loadCard"></div>
-    <div class="loadCard"></div>
-    <div class="loadCard"></div>
-    <div class="loadCard"></div>
-  </div>
-  <div class="loadText" id="loadText">Shuffling the deck…</div>
-  <div class="loadDots"><span></span><span></span><span></span></div>
+  <div class="loadIcon">🂡</div>
+  <h1 class="loadHeadline" id="loadHeadline">KING OF HEARTS</h1>
+  <p class="loadSub" id="loadSub">preparing…</p>
+  <div class="loadBarTrack"><div class="loadBarFill"></div></div>
 </div>
 
 <script src="data.js"></script>
