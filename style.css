@@ -1,8 +1,8 @@
 :root{
-  --bg:#0a0a0d; --bg2:#101014;
-  --line:rgba(255,255,255,.09); --line2:rgba(255,255,255,.16);
-  --text:#f2f2f5; --muted:#83838f; --muted2:#57575f;
-  --accent:#c8ff4d; --accent-dim:rgba(200,255,77,.14);
+  --bg:#000000; --bg2:#0a0a0a;
+  --line:rgba(255,255,255,.08); --line2:rgba(255,255,255,.14);
+  --text:#ffffff; --muted:#8a8a8e; --muted2:#565658;
+  --accent:#c8ff4d; --accent-dim:rgba(200,255,77,.12);
   --bad:#ff5c5c; --bad-dim:rgba(255,92,92,.12);
   --ok:#5cffb0; --ok-dim:rgba(92,255,176,.12);
   --ease:cubic-bezier(.16,1,.3,1);
@@ -14,13 +14,7 @@ body{
   font-family:'Inter',sans-serif; color:var(--text); background:var(--bg);
   min-height:100vh; position:relative; -webkit-font-smoothing:antialiased;
 }
-h1,h2,h3{font-family:'Space Grotesk',sans-serif; margin:0; letter-spacing:-.01em;}
-
-.orb{position:fixed; width:480px; height:480px; border-radius:50%; filter:blur(120px); opacity:.16; background:var(--accent);
-  top:-180px; left:50%; transform:translateX(-50%); pointer-events:none; z-index:0; animation:drift 22s var(--ease) infinite alternate;}
-@keyframes drift{0%{transform:translateX(-60%) translateY(0);}100%{transform:translateX(-40%) translateY(60px);}}
-.grain{position:fixed; inset:0; z-index:0; pointer-events:none; opacity:.025;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
+h1,h2,h3{font-family:'Space Grotesk',sans-serif; margin:0; letter-spacing:-.015em;}
 
 #app{position:relative; z-index:1; max-width:460px; margin:0 auto; height:100vh; height:100dvh;
   display:flex; flex-direction:column; padding-top:var(--safe-t); padding-bottom:var(--safe-b);}
@@ -199,3 +193,25 @@ h1,h2,h3{font-family:'Space Grotesk',sans-serif; margin:0; letter-spacing:-.01em
 .acc-body-inner{padding:0 16px 16px; font-size:12.5px; color:var(--muted); line-height:1.6; white-space:pre-line;}
 
 ::-webkit-scrollbar{display:none;}
+
+/* ---------- LANDING ---------- */
+#screen-landing{padding:0 22px; padding-top:calc(22px + var(--safe-t)); padding-bottom:calc(22px + var(--safe-b));}
+.landingLang{align-self:flex-end; margin-bottom:8px; opacity:0; animation:rise .5s var(--ease) forwards;}
+.hero{flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:22px;}
+.heroCards{display:flex; gap:10px; margin-bottom:4px;}
+.heroCard{width:52px; height:74px; border-radius:12px; border:1px solid var(--line2); display:flex; align-items:center; justify-content:center;
+  font-size:22px; background:#050505; opacity:0; animation:heroFloat 4.5s var(--ease) infinite, rise .6s var(--ease) forwards;}
+.heroCard.hc1{color:#e0264e; animation-delay:0s, 0s;}
+.heroCard.hc2{color:#e0264e; animation-delay:.3s, .08s; margin-top:-10px;}
+.heroCard.hc3{color:var(--text); animation-delay:.6s, .16s;}
+@keyframes heroFloat{0%,100%{transform:translateY(0) rotate(-2deg);} 50%{transform:translateY(-10px) rotate(2deg);}}
+.heroTitle{font-size:34px; font-weight:700; opacity:0; animation:rise .6s var(--ease) .2s forwards;}
+.heroTitle span{color:var(--accent);}
+.heroIntro{max-width:320px; font-size:14.5px; line-height:1.6; color:var(--muted); opacity:0; animation:rise .6s var(--ease) .28s forwards;}
+.heroFeatures{display:flex; gap:10px; flex-wrap:wrap; justify-content:center; opacity:0; animation:rise .6s var(--ease) .36s forwards;}
+.heroFeatures .feat{border:1px solid var(--line2); border-radius:100px; padding:7px 14px; font-size:12px; font-weight:600; color:var(--muted); display:flex; align-items:center; gap:6px;}
+.ctaBtn{margin-top:6px; background:var(--accent); color:#0a0a0d; border:none; border-radius:100px; padding:16px 34px; font-size:15px; font-weight:700;
+  font-family:'Inter'; box-shadow:0 0 0 0 rgba(200,255,77,.5); transition:transform .15s var(--ease), box-shadow .3s ease;
+  opacity:0; animation:rise .6s var(--ease) .46s forwards, ctaPulse 2.6s ease-in-out 1.2s infinite;}
+.ctaBtn:active{transform:scale(.94);}
+@keyframes ctaPulse{0%,100%{box-shadow:0 0 0 0 rgba(200,255,77,.35);} 50%{box-shadow:0 0 0 10px rgba(200,255,77,0);}}

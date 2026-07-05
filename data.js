@@ -233,6 +233,15 @@ const I18N = {
     akqjText: { ace: 'Ass — 1 Schluck', king: 'König — 2 Schlucke', queen: 'Dame — 3 Schlucke', jack: 'Bube — 4 Schlucke', safe: 'Ungefährlich' },
     mostLikelyReveal: 'Aufdecken', mostLikelyNext: 'Nächste Frage →',
     partyNext: 'Nächster Prompt →',
+    landing: {
+      intro: 'Der digitale Kartenstapel für deinen Abend: King\'s Cup, Busfahrer, Wer würde eher und mehr — animiert, minimalistisch, sofort startklar.',
+      cta: 'Los geht\'s →',
+      features: [
+        { icon: '🃏', label: '9 Spiele' },
+        { icon: '🌍', label: 'DE & EN' },
+        { icon: '⚡', label: 'Kein Setup' },
+      ],
+    },
   },
   en: {
     brand: 'card', brandAccent: 'party.', tagline: 'Minimal card drinking games',
@@ -269,5 +278,14 @@ const I18N = {
     akqjText: { ace: 'Ace — 1 sip', king: 'King — 2 sips', queen: 'Queen — 3 sips', jack: 'Jack — 4 sips', safe: 'Safe' },
     mostLikelyReveal: 'Reveal', mostLikelyNext: 'Next Question →',
     partyNext: 'Next Prompt →',
+    landing: {
+      intro: "The digital deck for your next get-together: King's Cup, Ride the Bus, Most Likely To and more — animated, minimal, ready in seconds.",
+      cta: "Let's go →",
+      features: [
+        { icon: '🃏', label: '9 games' },
+        { icon: '🌍', label: 'DE & EN' },
+        { icon: '⚡', label: 'Zero setup' },
+      ],
+    },
   },
 };

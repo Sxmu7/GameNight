@@ -91,7 +91,7 @@ function renderChips() {
 function setLang(l) {
   LANG = l; localStorage.setItem('cp_lang', l);
   document.documentElement.lang = l;
-  renderTopbar(); renderChips(); renderModeGrid();
+  renderTopbar(); renderChips(); renderModeGrid(); renderLanding();
 }
 function renderTopbar() {
   document.getElementById('tagline').textContent = T().tagline;
@@ -100,6 +100,17 @@ function renderTopbar() {
   document.getElementById('gamesLabel').textContent = T().gamesLabel;
   document.getElementById('rulesLinkTxt').textContent = T().rulesLabel;
   document.querySelectorAll('.langToggle button').forEach(b => b.classList.toggle('on', b.dataset.lang === LANG));
+}
+function renderLanding() {
+  const l = T().landing;
+  document.getElementById('landingIntro').textContent = l.intro;
+  document.getElementById('landingCta').textContent = l.cta;
+  document.getElementById('landingFeatures').innerHTML = l.features.map(f => `<div class="feat">${f.icon} ${f.label}</div>`).join('');
+}
+function enterApp() {
+  vib();
+  document.getElementById('screen-landing').classList.remove('active');
+  document.getElementById('screen-home').classList.add('active');
 }
 
 /* ---------------- MODE LIST ---------------- */
@@ -119,6 +130,7 @@ function renderModeGrid() {
 function goHome() {
   document.getElementById('screen-game').classList.remove('active');
   document.getElementById('screen-rules').classList.remove('active');
+  document.getElementById('screen-landing').classList.remove('active');
   document.getElementById('screen-home').classList.add('active');
   renderChips();
 }
@@ -613,3 +625,10 @@ function toggleAcc(i) {
 renderTopbar();
 renderModeGrid();
 renderChips();
+renderLanding();
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('service-worker.js').catch(() => {});
+  });
+}
