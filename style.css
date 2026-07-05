@@ -179,7 +179,7 @@ h1,h2,h3{font-family:'Baloo 2',sans-serif; margin:0; letter-spacing:-.01em;}
 .pileBox .pileSub{font-size:11px; color:var(--muted); font-weight:600;}
 .pileActiveTag{position:absolute; top:14px; right:16px; font-size:10px; font-weight:800; color:var(--accent); text-transform:uppercase; letter-spacing:.1em;}
 .pileCardWrap{display:flex; justify-content:center;}
-.pileMiniCard{width:64px; height:90px; border-radius:12px; background:#fdfdfc; position:relative; box-shadow:0 8px 18px rgba(0,0,0,.5);}
+.pileMiniCard{width:64px; height:90px; border-radius:12px; background:#fdfdfc; color:#111; position:relative; box-shadow:0 8px 18px rgba(0,0,0,.5);}
 .pileMiniCard .cardCorner.tl{top:6px; left:7px; font-size:13px;}
 .pileMiniCard .cardCorner.br{bottom:6px; right:7px; font-size:13px;}
 .pileMiniCard .cardCorner span{font-size:11px; margin-top:1px;}

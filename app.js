@@ -9,7 +9,7 @@ let currentPlayerIndex = 0;
 let deck = [];
 let mode = null;
 let uiBusy = false;
-const ICONS = { kings: '♛', bus: '▤', streak: '↗', redblack: '◐', dealer: '♣', akqj: '♦', mostlikely: '✦', party: '✺', mix: '⟳', anlegen: '🂡' };
+const ICONS = { kings: '♛', bus: '▤', dealer: '♣', akqj: '♦', mostlikely: '✦', party: '✺', mix: '⟳', anlegen: '🂡' };
 
 /* ---------------- CORE HELPERS ---------------- */
 function T() { return I18N[LANG]; }
@@ -133,7 +133,7 @@ function enterApp() {
 }
 
 /* ---------------- MODE LIST ---------------- */
-const MODE_IDS = ['anlegen', 'kings', 'bus', 'streak', 'redblack', 'dealer', 'akqj', 'mostlikely', 'party', 'mix'];
+const MODE_IDS = ['anlegen', 'kings', 'bus', 'dealer', 'akqj', 'mostlikely', 'party', 'mix'];
 function renderModeGrid() {
   document.getElementById('modeGrid').innerHTML = MODE_IDS.map(id => {
     const m = T().modes[id];
@@ -188,8 +188,6 @@ function dispatchInit(id) {
   const m = T().modes[id];
   if (id === 'kings') { goGame(m.title); initKings(); }
   if (id === 'bus') { goGame(m.title); initBus(); }
-  if (id === 'streak') { goGame(m.title); initStreak('rank'); }
-  if (id === 'redblack') { goGame(m.title); initStreak('color'); }
   if (id === 'dealer') { goGame(m.title); initDealer(); }
   if (id === 'akqj') { goGame(m.title); initAKQJ(); }
   if (id === 'mostlikely') { goGame(m.title); initMostLikely(); }
@@ -393,53 +391,6 @@ function busFinalGuess(guess) {
   }, 300);
 }
 
-/* ================= HIGHER/LOWER + RED/BLACK (shared streak engine) ================= */
-let stCard, stStreak, stBest, stKind;
-function initStreak(kind) {
-  stKind = kind; stStreak = 0; stBest = parseInt(localStorage.getItem('cp_best_' + kind) || '0');
-  stCard = draw();
-  renderStreak();
-}
-function renderStreak(feedback) {
-  const isRank = stKind === 'rank';
-  document.getElementById('gameBody').innerHTML = `
-    <div class="scene">
-      <div class="streakRow">
-        <div class="statPill"><b>${stStreak}</b><span>${T().streak}</span></div>
-        <div class="statPill"><b>${stBest}</b><span>${T().best}</span></div>
-      </div>
-      <div class="perspective"><div class="cardFlip flipped" id="stCard"><div class="face back"></div><div class="face front" id="stFront">${cardFaceHTML(stCard)}</div></div></div>
-      <div class="feedback ${feedback ? ('show ' + feedback.cls) : ''}" id="stFeedback">${feedback ? feedback.text : ''}</div>
-      <div class="btnRow">
-        ${isRank
-          ? `<button class="btn primary" onclick="stGuess('higher')">${T().higher}</button><button class="btn primary" onclick="stGuess('lower')">${T().lower}</button>`
-          : `<button class="btn red-out" onclick="stGuess('red')">${T().red}</button><button class="btn dark-out" onclick="stGuess('black')">${T().black}</button>`}
-      </div>
-    </div>`;
-}
-function stGuess(guess) {
-  const next = draw();
-  vib(15);
-  let result;
-  if (stKind === 'rank') {
-    if (next.rank === stCard.rank) result = null;
-    else result = (guess === 'higher' && next.rank > stCard.rank) || (guess === 'lower' && next.rank < stCard.rank);
-  } else {
-    result = (guess === 'red' && next.color === 'red') || (guess === 'black' && next.color === 'black');
-  }
-  if (result === null) { stCard = next; renderStreak({ cls: '', text: T().push }); return; }
-  if (result) {
-    stStreak++; if (stStreak > stBest) { stBest = stStreak; localStorage.setItem('cp_best_' + stKind, stBest); }
-    stCard = next; renderStreak({ cls: 'ok', text: T().correct + ' — ' + T().streak + ' ' + stStreak });
-  } else {
-    addDrink(Math.max(1, stStreak));
-    showToast(currentPlayer().name + ' ' + Math.max(1, stStreak) + '×');
-    advanceTurn();
-    stStreak = 0; stCard = next;
-    renderStreak({ cls: 'bad', text: T().wrong });
-  }
-}
-
 /* ================= FUCK THE DEALER ================= */
 let fdDealerIdx, fdSubIdx, fdRefs, fdWinStreak;
 function initDealer() {
@@ -615,7 +566,7 @@ function mixChallenge(kind) {
   const refHTML = window._mixRef ? `<div class="refs"><div class="miniCard ${window._mixRef.color}">${RANK_LABEL(window._mixRef.rank)}${window._mixRef.suit}</div></div>` : '';
   document.getElementById('gameBody').innerHTML = `
     <div class="scene">
-      <div class="rulebox plain show"><div class="rtxt">${kind === 0 ? T().modes.redblack.title : T().modes.streak.title}</div></div>
+      <div class="rulebox plain show"><div class="rtxt">${kind === 0 ? T().challengeRedBlack : T().challengeHigherLower}</div></div>
       ${refHTML}
       <div class="perspective"><div class="cardFlip" id="mixCard"><div class="face back"></div><div class="face front" id="mixFront"></div></div></div>
       <div class="feedback" id="mixFeedback"></div>
@@ -638,10 +589,20 @@ function mixGuess(kind, guess) {
   }, 300);
 }
 
-/* ================= ANLEGEN (High / Low / Same, 3 piles) ================= */
-let anPiles, anActive, anExtreme;
+/* ================= ANLEGEN (High / Low / Same, 3 piles — 7 to Ace, 32-card deck) ================= */
+let anPiles, anActive, anExtreme, anDeck;
+function buildAnlegenDeck() {
+  let d = [];
+  SUITS.forEach(su => { for (let r = 7; r <= 14; r++) d.push({ rank: r, suit: su.s, color: su.c }); });
+  return shuffle(d);
+}
+function anDraw() {
+  if (anDeck.length === 0) { anDeck = buildAnlegenDeck(); showToast(T().deckReshuffled); }
+  return anDeck.pop();
+}
 function initAnlegen() {
-  anPiles = [0, 1, 2].map(() => ({ card: draw(), streak: 0 }));
+  anDeck = buildAnlegenDeck();
+  anPiles = [0, 1, 2].map(() => ({ card: anDraw(), streak: 0 }));
   anActive = 0; anExtreme = false;
   renderAnlegen();
 }
@@ -666,7 +627,7 @@ function renderAnlegen(feedback) {
       <div class="pileList">${pilesHTML}</div>
       <div class="statusBar">
         <div class="classicTag">${az.classic}</div>
-        <div class="statusRow"><span>${az.streak}: <b>${active.streak}/3</b></span><span>🍺 <b>${currentPlayer().name}</b></span><span>${az.deck}: <b>${deck.length}</b></span></div>
+        <div class="statusRow"><span>${az.streak}: <b>${active.streak}/3</b></span><span>🍺 <b>${currentPlayer().name}</b></span><span>${az.deck}: <b>${anDeck.length}</b></span></div>
         <div class="whereQ">${az.where}</div>
         <div class="feedback ${feedback ? ('show ' + feedback.cls) : ''}">${feedback ? feedback.text : ''}</div>
         <div class="btnRow">
@@ -683,7 +644,7 @@ function renderAnlegen(feedback) {
 function anSelect(i) { anActive = i; renderAnlegen(); }
 function anGuess(dir) {
   const pile = anPiles[anActive];
-  const card = draw();
+  const card = anDraw();
   vib(15);
   let result;
   if (card.rank === pile.card.rank) result = null;
@@ -708,7 +669,7 @@ function anBank() {
   addWin(currentPlayerIndex);
   if (anExtreme) addWin(currentPlayerIndex);
   floatPlus('🏆');
-  anPiles[anActive] = { card: draw(), streak: 0 };
+  anPiles[anActive] = { card: anDraw(), streak: 0 };
   anExtreme = false;
   advanceTurn();
   anActive = (anActive + 1) % anPiles.length;

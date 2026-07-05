@@ -225,11 +225,10 @@ const I18N = {
     preparing: 'bereitet vor…',
     backAria: 'Zurück', ready: 'Bereit',
     navHome: 'Home', navRules: 'Regeln', turnLabel: 'Am Zug',
+    challengeRedBlack: 'Rot oder Schwarz', challengeHigherLower: 'Höher oder Tiefer',
     modes: {
       kings: { title: "King's Cup", desc: 'Volles Deck — jede Karte hat eine eigene Regel' },
       bus: { title: 'Busfahrer', desc: '3 Phasen: Fragen, Pyramide, die Kartenstraße' },
-      streak: { title: 'Höher / Tiefer', desc: 'Endlos-Serie — wie weit kommst du?' },
-      redblack: { title: 'Rot oder Schwarz', desc: 'Errate die Farbe der nächsten Karte' },
       dealer: { title: 'Fuck the Dealer', desc: 'Dealer gegen Ratende — wer trinkt zuerst?' },
       akqj: { title: 'Ass, König, Dame, Bube', desc: 'Bildkarten zählen Schlucke — der Rest ist sicher' },
       mostlikely: { title: 'Wer würde eher', desc: 'Zeigt auf die passendste Person' },
@@ -261,7 +260,7 @@ const I18N = {
       intro: 'Der digitale Kartenstapel für deinen Abend: King\'s Cup, Busfahrer, Wer würde eher und mehr — animiert, minimalistisch, sofort startklar.',
       cta: 'Los geht\'s →',
       features: [
-        { icon: '🃏', label: '10 Spiele' },
+        { icon: '🃏', label: '8 Spiele' },
         { icon: '🌍', label: 'DE & EN' },
         { icon: '⚡', label: 'Kein Setup' },
       ],
@@ -280,11 +279,10 @@ const I18N = {
     preparing: 'preparing…',
     backAria: 'Back', ready: 'Ready',
     navHome: 'Home', navRules: 'Rules', turnLabel: 'Your Turn',
+    challengeRedBlack: 'Red or Black', challengeHigherLower: 'Higher or Lower',
     modes: {
       kings: { title: "King's Cup", desc: 'Full deck — every card triggers its own rule' },
       bus: { title: 'Ride the Bus', desc: '3 phases: questions, pyramid, the bus' },
-      streak: { title: 'Higher / Lower', desc: 'Endless streak — how far can you go?' },
-      redblack: { title: 'Red or Black', desc: 'Guess the color of the next card' },
       dealer: { title: 'Fuck the Dealer', desc: 'Dealer vs. guessers — who drinks first?' },
       akqj: { title: 'Ace, King, Queen, Jack', desc: 'Face cards count sips — everything else is safe' },
       mostlikely: { title: 'Most Likely To', desc: 'Point at whoever fits the prompt best' },
@@ -316,7 +314,7 @@ const I18N = {
       intro: "The digital deck for your next get-together: King's Cup, Ride the Bus, Most Likely To and more — animated, minimal, ready in seconds.",
       cta: "Let's go →",
       features: [
-        { icon: '🃏', label: '10 games' },
+        { icon: '🃏', label: '8 games' },
         { icon: '🌍', label: 'DE & EN' },
         { icon: '⚡', label: 'Zero setup' },
       ],
