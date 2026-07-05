@@ -606,7 +606,7 @@ function initAnlegen() {
   anActive = 0; anExtreme = false;
   renderAnlegen();
 }
-function renderAnlegen(feedback) {
+function renderAnlegen(feedback, changedIdx) {
   const az = T().anlegen;
   const maxStreak = Math.max(...anPiles.map(p => p.streak));
   const pilesHTML = anPiles.map((p, i) => `
@@ -616,7 +616,7 @@ function renderAnlegen(feedback) {
         <h3>${az.pile} ${i + 1}</h3>
         <span class="pileSub">${p.streak} ${p.streak === 1 ? az.card1 : az.cardN}${p.streak > 0 && p.streak === maxStreak ? ' · ' + az.longest : ''}</span>
       </div>
-      <div class="pileCardWrap"><div class="pileMiniCard">${cardFaceHTML(p.card)}</div></div>
+      <div class="pileCardWrap"><div class="pileMiniCard ${i === changedIdx && feedback && feedback.cls === 'bad' ? 'wrong' : ''}">${cardFaceHTML(p.card)}</div></div>
     </div>`).join('');
   const active = anPiles[anActive];
   const canBank = active.streak >= 3;
@@ -643,23 +643,27 @@ function renderAnlegen(feedback) {
 }
 function anSelect(i) { anActive = i; renderAnlegen(); }
 function anGuess(dir) {
+  if (uiBusy) return; uiBusy = true;
+  const guessedIdx = anActive;
   const pile = anPiles[anActive];
   const card = anDraw();
   vib(15);
   let result;
   if (card.rank === pile.card.rank) result = null;
   else result = (dir === 'right' && card.rank > pile.card.rank) || (dir === 'left' && card.rank < pile.card.rank);
-  if (result === null) { pile.card = card; renderAnlegen({ cls: '', text: T().push }); return; }
+  if (result === null) { pile.card = card; uiBusy = false; renderAnlegen({ cls: '', text: T().push }, guessedIdx); return; }
   if (result) {
     pile.streak++; pile.card = card;
-    renderAnlegen({ cls: 'ok', text: T().correct + ' — ' + T().anlegen.streak + ' ' + pile.streak });
+    uiBusy = false;
+    renderAnlegen({ cls: 'ok', text: T().correct + ' — ' + T().anlegen.streak + ' ' + pile.streak }, guessedIdx);
   } else {
     const penalty = anExtreme ? 2 : 1;
     addDrink(penalty);
     pile.streak = 0; pile.card = card; anExtreme = false;
     advanceTurn();
     anActive = (anActive + 1) % anPiles.length;
-    renderAnlegen({ cls: 'bad', text: T().anlegen.busted(penalty) });
+    uiBusy = false;
+    renderAnlegen({ cls: 'bad', text: T().anlegen.busted(penalty) }, guessedIdx);
   }
 }
 function anBank() {

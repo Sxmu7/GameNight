@@ -178,11 +178,26 @@ h1,h2,h3{font-family:'Baloo 2',sans-serif; margin:0; letter-spacing:-.01em;}
 .pileBox h3{font-size:15px; font-weight:800;}
 .pileBox .pileSub{font-size:11px; color:var(--muted); font-weight:600;}
 .pileActiveTag{position:absolute; top:14px; right:16px; font-size:10px; font-weight:800; color:var(--accent); text-transform:uppercase; letter-spacing:.1em;}
-.pileCardWrap{display:flex; justify-content:center;}
-.pileMiniCard{width:64px; height:90px; border-radius:12px; background:#fdfdfc; color:#111; position:relative; box-shadow:0 8px 18px rgba(0,0,0,.5);}
-.pileMiniCard .cardCorner.tl{top:6px; left:7px; font-size:13px;}
-.pileMiniCard .cardCorner.br{bottom:6px; right:7px; font-size:13px;}
-.pileMiniCard .cardCorner span{font-size:11px; margin-top:1px;}
+.pileCardWrap{display:flex; justify-content:center; perspective:700px;}
+.pileMiniCard{width:76px; height:106px; border-radius:14px; background:#fdfdfc; color:#111; position:relative; box-shadow:0 10px 22px rgba(0,0,0,.55);
+  animation:pileCardIn .5s var(--ease);}
+.pileMiniCard.wrong{animation:pileCardWrong .5s var(--ease);}
+@keyframes pileCardIn{
+  0%{transform:rotateY(-100deg) scale(.8); opacity:0;}
+  55%{transform:rotateY(12deg) scale(1.05); opacity:1;}
+  100%{transform:rotateY(0deg) scale(1); opacity:1;}
+}
+@keyframes pileCardWrong{
+  0%{transform:rotateY(-100deg) scale(.8); opacity:0;}
+  30%{transform:translateX(-6px);}
+  45%{transform:translateX(6px);}
+  60%{transform:translateX(-4px);}
+  75%{transform:translateX(4px);}
+  100%{transform:rotateY(0deg) translateX(0) scale(1); opacity:1;}
+}
+.pileMiniCard .cardCorner.tl{top:8px; left:9px; font-size:16px;}
+.pileMiniCard .cardCorner.br{bottom:8px; right:9px; font-size:16px;}
+.pileMiniCard .cardCorner span{font-size:14px; margin-top:1px;}
 .statusBar{width:100%; background:var(--panel); border-radius:20px; padding:16px; display:flex; flex-direction:column; gap:12px; align-items:center;}
 .statusRow{display:flex; justify-content:space-between; width:100%; font-size:12px; color:var(--muted); font-weight:700;}
 .statusRow b{color:var(--text); font-family:'Baloo 2';}
