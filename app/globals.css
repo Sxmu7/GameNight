@@ -1,0 +1,51 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+}
+
+html,
+body {
+  background: #0b0b10;
+  color: #f4f4f7;
+  overscroll-behavior: none;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.card {
+  background: linear-gradient(180deg, #15151d 0%, #121218 100%);
+  border: 1px solid #2a2a38;
+  border-radius: 1.25rem;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #ff4d6d 0%, #ff7a59 100%);
+  color: #0b0b10;
+  font-weight: 700;
+}
+
+.btn-ghost {
+  background: transparent;
+  border: 1px solid #2a2a38;
+  color: #f4f4f7;
+}
+
+.intensity-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar {
+  width: 0px;
+  height: 0px;
+}

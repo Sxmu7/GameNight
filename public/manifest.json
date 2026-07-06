@@ -1,0 +1,10 @@
+{
+  "name": "PartyRound",
+  "short_name": "PartyRound",
+  "description": "Kategorisierter Trinkspiel-Katalog mit DE/EN/ES, Stats und Online-Modus.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0b0b10",
+  "theme_color": "#0b0b10",
+  "orientation": "portrait"
+}
