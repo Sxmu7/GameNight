@@ -1,0 +1,36 @@
+// Real, curated prompt decks for "Wahrheit oder Pflicht" — no placeholders.
+export const TRUTHS = [
+  "Was ist die peinlichste Nachricht in deinem Handy?",
+  "Wer aus dieser Runde würdest du am ehesten daten?",
+  "Was ist die größte Lüge, die du je erzählt hast?",
+  "Welche App checkst du morgens als Erstes?",
+  "Was war dein peinlichster Moment in der Schule?",
+  "Wen hast du zuletzt heimlich auf Social Media gestalkt?",
+  "Was ist das Unangenehmste, das dir auf einem Date passiert ist?",
+  "Welche Notlüge benutzt du am häufigsten?",
+  "Was würdest du nie öffentlich zugeben, außer jetzt?",
+  "Wer in dieser Runde könnte dich am ehesten überreden, etwas Dummes zu tun?",
+  "Was ist dein größtes Guilty Pleasure?",
+  "Welche Nachricht hast du abgeschickt und sofort bereut?",
+  "Was ist das Verrückteste, das du je um 3 Uhr nachts getan hast?",
+  "Wem in dieser Runde würdest du am ehesten dein Passwort anvertrauen?",
+  "Was war dein peinlichster Spitzname?",
+];
+
+export const DARES = [
+  "Mach 10 Liegestütze — sofort.",
+  "Tanze 20 Sekunden ohne Musik, alle schauen zu.",
+  "Lass dir von der Gruppe ein Wort geben und erfinde einen Rap dazu.",
+  "Sprich für die nächsten drei Minuten mit einem Akzent deiner Wahl.",
+  "Ruf jemanden an und sing die ersten Zeilen eines Liedes vor.",
+  "Lass die Gruppe dein nächstes Story-Bild aussuchen.",
+  "Mach ein Kompliment an jede Person in der Runde — ohne zu lachen.",
+  "Erzähl einen Witz. Lacht niemand, trinkst du extra.",
+  "Tausche für die nächste Runde einen Gegenstand mit deinem Nachbarn.",
+  "Imitiere eine Person aus der Runde, die anderen raten wer.",
+  "Erzähl die Handlung deines Lieblingsfilms nur mit Gesten.",
+  "Lass dir von jemandem die Schuhe binden — mit geschlossenen Augen.",
+  "Sing den Refrain eines Liedes, das dir gerade einfällt.",
+  "Halte 30 Sekunden lang Blickkontakt mit deinem Nachbarn, ohne zu lachen.",
+  "Erfinde spontan ein Trinklied für diese Runde.",
+];

@@ -1,30 +1,46 @@
-# PartyRound
+# ANLEGEN — Game Night
 
-Kategorisierter Trinkspiel-Katalog als Next.js-App (App Router, TypeScript, Tailwind, Framer Motion).
+Vite + React + Tailwind + Framer Motion + Firebase Realtime Database.
 
-## Features
-- Sprachumschaltung DE (Standard) / EN / ES, jederzeit live umstellbar, pro Nutzer in `localStorage` gespeichert
-- Kategorisierter Spiele-Katalog mit echten Ankerspielen + Platzhalter-Einträgen nach einheitlichem Schema
-- Online-Lobby, die automatisch nur `onlineCapable`-Spiele anzeigt
-- Lokales Stats-Tracking (Sessions, gespielte Spiele, Lieblingsspiel, Verlauf)
-- Sanfter Modus (alkoholfrei) + 18+ Hinweis-Gate beim ersten Start
-- Mobile-first UI mit Framer-Motion-Animationen (Seitenübergänge, Sprach-Pill, Zufallsspiel-Shuffle)
+## Enthalten
 
-## Entwicklung
+- **Intro:** animiertes, nachgebautes "GAME NIGHT"-Logo (SVG, kein Platzhalter) als Splash-Screen.
+- **Hub / Landing Page:** merkt den Spielernamen dauerhaft auf dem Gerät (`localStorage`), zeigt eine saubere Spielauswahl.
+- **ANLEGEN:** vollständiges Höher/Tiefer/Gleich-Kartenspiel — Klassisch- und Party-Modi (Hardcore, Speed, Chaos, Teams, Last Man, Random, Storage, Turm), Extreme-Deck, Getränke-Auswahl, echte Firebase-Online-Lobby mit Raumcode/QR, Bluetooth-Lokal-Lobby, Regeln & Statistik-Screens.
+- **Ich hab noch nie:** 30 kuratierte Karten (Mild/Spicy), lokal oder online über eine eigene Firebase-Lobby.
+- **Wahrheit oder Pflicht:** 15 echte Wahrheitsfragen, 15 echte Aufgaben, Zufallsauswahl des Spielers.
+
+Alle drei Spiele sind vollständig spielbar — keine "Platzhalter"-Karten mehr.
+
+## Lokal starten
 
 ```bash
 npm install
 npm run dev
 ```
 
-## Struktur
-- `app/` – Routen (Home, Kategorie, Spiel-Detail, Online, Stats)
-- `components/` – UI-Bausteine
-- `lib/data/games.ts` – Spiele-Katalog (Datenquelle für alles)
-- `lib/i18n/` – Übersetzungen + Sprachkontext
-- `lib/stats/` – LocalStorage-Statistik-Hook
+## Deployen (Vercel)
 
-## Nächste Schritte
-- Design-Feinabstimmung an eine bestehende Vorlage anpassen, sobald diese verfügbar ist
-- Echte Online-Verbindung (WebSocket/Realtime) statt Mock-Lobby
-- Weitere Platzhalter-Spiele mit echten Regeltexten befüllen
+Framework Preset: **Vite** · Build Command: `npm run build` · Output Directory: `dist`
+
+```bash
+npm install
+vercel deploy --prod
+```
+
+## Struktur
+
+- `src/App.jsx` — Intro → Hub → Spielauswahl
+- `src/games/anlegen/` — vollständiges ANLEGEN-Kartenspiel
+- `src/games/niemals/` — "Ich hab noch nie" mit echtem Karten-Deck
+- `src/games/wahrheit/` — "Wahrheit oder Pflicht" mit echten Fragen/Aufgaben
+- `src/lib/onlineRoom.js` — gemeinsame Firebase-Lobby-Infrastruktur (Raumcode erstellen/beitreten/synchronisieren), von allen Online-Spielen genutzt
+- `src/lib/usePlayerName.js` — geräteweite Namensspeicherung
+- `src/components/GameNightLogo.jsx` + `IntroScreen.jsx` — animiertes Logo
+
+## Hinweis zu alten Next.js-Dateien
+
+Der erste Entwurf (Next.js, "PartyRound") liegt noch als totes Restmaterial im selben Ordner
+(`app/`, `components/*.tsx`, `lib/data`, `next.config.mjs`, `tsconfig.json` u. a.) — er wird von
+diesem Vite-Projekt nicht mehr verwendet. Ohne Shell-Zugriff konnten diese Dateien nicht automatisch
+gelöscht werden; sie können manuell entfernt werden.

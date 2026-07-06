@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <circle cx="256" cy="256" r="248" fill="#000"/>
+  <circle cx="256" cy="256" r="238" fill="none" stroke="#D4AF37" stroke-width="10"/>
+
+  <!-- Ace of spades (black) -->
+  <g transform="translate(190,150) rotate(-14)">
+    <rect x="-42" y="-58" width="84" height="118" rx="10" fill="#fff"/>
+    <text x="-32" y="-30" font-family="Georgia, serif" font-size="26" font-weight="700" fill="#000">A</text>
+    <text x="-24" y="14" font-family="Arial" font-size="40" fill="#000">♠</text>
+  </g>
+
+  <!-- Ace of hearts (red) -->
+  <g transform="translate(266,146) rotate(10)">
+    <rect x="-42" y="-58" width="84" height="118" rx="10" fill="#fff"/>
+    <text x="-32" y="-30" font-family="Georgia, serif" font-size="26" font-weight="700" fill="#D42A2A">A</text>
+    <text x="-24" y="16" font-family="Arial" font-size="40" fill="#D42A2A">♥</text>
+  </g>
+
+  <!-- Martini glass -->
+  <g transform="translate(228,300)">
+    <path d="M -46 -34 L 46 -34 L 4 22 L 4 58 L 26 58 L 26 68 L -26 68 L -26 58 L -4 58 L -4 22 Z" fill="none" stroke="#D4AF37" stroke-width="7" stroke-linejoin="round"/>
+  </g>
+
+  <!-- Beer glass -->
+  <g transform="translate(330,300)">
+    <path d="M -30 -46 L 30 -46 L 26 60 L -26 60 Z" fill="none" stroke="#D4AF37" stroke-width="7" stroke-linejoin="round"/>
+    <path d="M -30 -30 Q -6 -10 -30 8" fill="none" stroke="#D4AF37" stroke-width="6"/>
+    <ellipse cx="0" cy="-46" rx="30" ry="8" fill="#D4AF37"/>
+  </g>
+
+  <!-- Dice -->
+  <g transform="translate(150,340) rotate(-10)">
+    <rect x="-26" y="-26" width="52" height="52" rx="10" fill="#0A0A0A" stroke="#D4AF37" stroke-width="5"/>
+    <circle cx="-10" cy="-10" r="5" fill="#D4AF37"/>
+    <circle cx="10" cy="-10" r="5" fill="#D4AF37"/>
+    <circle cx="-10" cy="10" r="5" fill="#D4AF37"/>
+    <circle cx="10" cy="10" r="5" fill="#D4AF37"/>
+    <circle cx="0" cy="0" r="5" fill="#D4AF37"/>
+  </g>
+
+  <!-- Poker chip -->
+  <g transform="translate(140,382)">
+    <circle r="26" fill="#0A0A0A" stroke="#D4AF37" stroke-width="6"/>
+    <circle r="16" fill="none" stroke="#D4AF37" stroke-width="4" stroke-dasharray="6 6"/>
+  </g>
+
+  <!-- Wordmark -->
+  <text x="256" y="440" text-anchor="middle" font-family="Arial Black, Arial" font-size="52" font-weight="900" fill="#fff" letter-spacing="6">GAME</text>
+  <text x="256" y="472" text-anchor="middle" font-family="Arial" font-size="24" font-weight="700" fill="#D4AF37" letter-spacing="10">— NIGHT —</text>
+</svg>
