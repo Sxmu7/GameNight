@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import IntroScreen from "./components/IntroScreen";
+import OnboardingScreens, { hasSeenOnboarding } from "./components/OnboardingScreens";
+import NameGate from "./components/NameGate";
 import GameNightLogo from "./components/GameNightLogo";
 import { usePlayerName } from "./lib/usePlayerName";
 import { LanguageProvider, useLanguage, LANGS } from "./lib/i18n/LanguageContext";
@@ -9,6 +11,8 @@ import NiemalsGame from "./games/niemals/NiemalsGame";
 import WahrheitGame from "./games/wahrheit/WahrheitGame";
 import { NIEMALS_PROMPTS } from "./games/niemals/prompts";
 import { TRUTHS, DARES } from "./games/wahrheit/prompts";
+
+const NAME_KEY = "anlegen_pname";
 
 const GAMES = [
   { id: "anlegen", emoji: "🂡", online: true, key: "anlegen" },
@@ -33,10 +37,9 @@ function LanguageSwitcher() {
   );
 }
 
-function Hub({ onSelect }) {
+function Hub({ onSelect, onChangeName }) {
   const { t } = useLanguage();
-  const { name, setName, clearName } = usePlayerName();
-  const [nameInput, setNameInput] = useState("");
+  const { name } = usePlayerName();
 
   return (
     <div className="fixed inset-0 bg-black text-white font-sans overflow-y-auto" style={{ WebkitOverflowScrolling: "touch" }}>
@@ -48,25 +51,13 @@ function Hub({ onSelect }) {
           <LanguageSwitcher />
         </motion.div>
 
-        {/* Name — remembered on this device */}
-        <div className="rounded-[28px] border border-white/10 bg-black/45 backdrop-blur-2xl p-4">
-          {name ? (
-            <div className="flex items-center justify-between">
-              <div className="text-sm text-white/60">{t("hub.name.label")}</div>
-              <div className="flex items-center gap-2">
-                <span className="font-black text-lg">{name}</span>
-                <button onClick={clearName} className="text-xs text-white/30 underline">{t("hub.name.change")}</button>
-              </div>
-            </div>
-          ) : (
-            <div className="flex gap-2">
-              <input value={nameInput} onChange={e => setNameInput(e.target.value)} placeholder={t("hub.name.placeholder")}
-                onKeyDown={e => e.key === "Enter" && setName(nameInput)}
-                className="flex-1 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-center font-bold outline-none" />
-              <button onClick={() => setName(nameInput)} disabled={!nameInput.trim()}
-                className="rounded-2xl px-5 font-black bg-white text-black disabled:opacity-40">{t("hub.name.remember")}</button>
-            </div>
-          )}
+        {/* Name — already collected before the hub, just shown here */}
+        <div className="rounded-[28px] border border-white/10 bg-black/45 backdrop-blur-2xl p-4 flex items-center justify-between">
+          <div className="text-sm text-white/60">{t("hub.name.label")}</div>
+          <div className="flex items-center gap-2">
+            <span className="font-black text-lg">{name}</span>
+            <button onClick={onChangeName} className="text-xs text-white/30 underline">{t("hub.name.change")}</button>
+          </div>
         </div>
 
         {/* Game picker */}
@@ -109,15 +100,21 @@ function Hub({ onSelect }) {
 
 function AppInner() {
   const [introDone, setIntroDone] = useState(false);
+  const [onboardingDone, setOnboardingDone] = useState(hasSeenOnboarding);
+  const [nameConfirmed, setNameConfirmed] = useState(() => !!localStorage.getItem(NAME_KEY));
   const [activeGame, setActiveGame] = useState(null);
 
+  // Order: animated logo intro -> (first run only) animated explainer ->
+  // name gate (blocks until a name is saved) -> hub / game picker.
   if (!introDone) return <IntroScreen onDone={() => setIntroDone(true)} />;
+  if (!onboardingDone) return <OnboardingScreens onDone={() => setOnboardingDone(true)} />;
+  if (!nameConfirmed) return <NameGate onDone={() => setNameConfirmed(true)} />;
 
   if (activeGame === "anlegen") return <AnlegenGame onExit={() => setActiveGame(null)} />;
   if (activeGame === "niemals") return <NiemalsGame onExit={() => setActiveGame(null)} />;
   if (activeGame === "wahrheit") return <WahrheitGame onExit={() => setActiveGame(null)} />;
 
-  return <Hub onSelect={setActiveGame} />;
+  return <Hub onSelect={setActiveGame} onChangeName={() => setNameConfirmed(false)} />;
 }
 
 export default function App() {

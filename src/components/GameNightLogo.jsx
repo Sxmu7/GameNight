@@ -1,10 +1,44 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
 
-// Recreated version of the uploaded "GAME NIGHT" circular badge — black
-// background, gold ring, fanned aces, martini + beer glass, dice + chip,
-// "GAME — NIGHT —" wordmark. Built as SVG so every element can be animated
-// individually for the intro sequence.
+// Shows the real uploaded "GAME NIGHT" logo (public/logo.png) with an
+// animated reveal + soft idle glow. Falls back to a hand-drawn SVG
+// recreation automatically if logo.png hasn't been added to the project yet,
+// so nothing breaks in the meantime.
 export default function GameNightLogo({ size = 220, animated = true }) {
+  const [imgFailed, setImgFailed] = useState(false);
+
+  if (imgFailed) return <FallbackLogo size={size} animated={animated} />;
+
+  return (
+    <motion.div
+      style={{ width: size, height: size, position: "relative" }}
+      initial={animated ? { opacity: 0, scale: 0.55, y: 24 } : false}
+      animate={{ opacity: 1, scale: 1, y: 0 }}
+      transition={{ type: "spring", stiffness: 190, damping: 18, duration: 0.9 }}
+    >
+      {animated && (
+        <motion.div
+          className="absolute inset-0 rounded-full"
+          style={{ background: "radial-gradient(circle, rgba(212,175,55,0.45) 0%, transparent 70%)" }}
+          animate={{ opacity: [0.4, 0.85, 0.4], scale: [0.92, 1.06, 0.92] }}
+          transition={{ duration: 2.6, repeat: Infinity, ease: "easeInOut" }}
+        />
+      )}
+      <motion.img
+        src="/logo.png"
+        alt="Game Night"
+        onError={() => setImgFailed(true)}
+        style={{ width: "100%", height: "100%", objectFit: "contain", position: "relative" }}
+        animate={animated ? { rotate: [-2, 2, -2], y: [0, -4, 0] } : {}}
+        transition={animated ? { duration: 4, repeat: Infinity, ease: "easeInOut" } : {}}
+      />
+    </motion.div>
+  );
+}
+
+// Original hand-drawn recreation — kept as an automatic fallback.
+function FallbackLogo({ size, animated }) {
   const ring = {
     hidden: { pathLength: 0, opacity: 0 },
     show: { pathLength: 1, opacity: 1, transition: { duration: 1.1, ease: "easeOut" } },
@@ -19,16 +53,9 @@ export default function GameNightLogo({ size = 220, animated = true }) {
   });
 
   return (
-    <motion.svg
-      width={size} height={size} viewBox="0 0 512 512"
-      initial={animated ? "hidden" : "show"}
-      animate="show"
-    >
+    <motion.svg width={size} height={size} viewBox="0 0 512 512" initial={animated ? "hidden" : "show"} animate="show">
       <circle cx="256" cy="256" r="248" fill="#000" />
-      <motion.circle
-        cx="256" cy="256" r="238" fill="none" stroke="#D4AF37" strokeWidth="10"
-        variants={ring}
-      />
+      <motion.circle cx="256" cy="256" r="238" fill="none" stroke="#D4AF37" strokeWidth="10" variants={ring} />
 
       <motion.g variants={pop(0.25)} transform="translate(186,168) rotate(-13)">
         <rect x="-46" y="-64" width="92" height="130" rx="12" fill="#fff" />
@@ -42,13 +69,11 @@ export default function GameNightLogo({ size = 220, animated = true }) {
         <text x="-31" y="36" fontFamily="Arial" fontSize="58" fill="#D42A2A">♥</text>
       </motion.g>
 
-      {/* Martini — solid gold fill, black outline, like the reference badge */}
       <motion.g variants={pop(0.55)} transform="translate(226,318)">
         <path d="M -48 -36 L 48 -36 L 6 24 L 6 62 L 30 62 L 30 74 L -30 74 L -30 62 L -6 62 L -6 24 Z"
           fill="#D4AF37" stroke="#0A0A0A" strokeWidth="8" strokeLinejoin="round" />
       </motion.g>
 
-      {/* Beer — solid gold body, black outline, white foam cap */}
       <motion.g variants={pop(0.65)} transform="translate(332,312)">
         <path d="M -32 -34 L 32 -34 L 27 64 L -27 64 Z" fill="#D4AF37" stroke="#0A0A0A" strokeWidth="8" strokeLinejoin="round" />
         <path d="M -30 -18 Q -4 2 -30 22" fill="none" stroke="#0A0A0A" strokeWidth="5" strokeLinecap="round" opacity="0.35" />
