@@ -2,10 +2,10 @@ import React, { useState, useEffect, useRef, useMemo, useCallback } from "react"
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeft, ArrowRight, RefreshCw, BookOpen, Home, Zap,
-  Users, Wifi, Trash2, UserPlus, Bluetooth, Plus, QrCode, Info, Eye,
+  Users, Wifi, Trash2, UserPlus, Bluetooth, QrCode, Info, Eye,
 } from "lucide-react";
 import { db } from "../../firebase";
-import { ref, set, get, onValue, off, remove, serverTimestamp } from "firebase/database";
+import { ref, set, get, onValue, off, remove } from "firebase/database";
 
 // ─── Admin Codes ─────────────────────────────────────────────────────────────
 const ADMIN_CODES = ["TIGER-482","WOLF-917","EAGLE-253","SHARK-731","LION-604","COBRA-385","FALCON-129","PANTHER-847","VIPER-562","GHOST-318","STORM-745","BLAZE-193","FROST-826","RAVEN-471","THUNDER-039","SHADOW-684","CRYSTAL-257","ROCKET-913","LEGEND-548","MYSTIC-762","PHOENIX-431","DIESEL-879","MATRIX-364","ULTRA-597","DELTA-128","OMEGA-853","ALPHA-276","ZENITH-641","NOVA-395","TITAN-718","SXMU_UNLIMITED"];
@@ -143,7 +143,6 @@ export default function AnlegenGame({ onExit }){
   // Starts straight at "home" — the shared app shell already played the
   // logo intro before this game was opened.
   const [screen, setScreen]   = useState("home");
-  const [introLevel, setIntroLevel] = useState(0);
 
   // ── Game config ──────────────────────────────────────────────────────────
   const [gameMode, setGameMode]           = useState("classic");

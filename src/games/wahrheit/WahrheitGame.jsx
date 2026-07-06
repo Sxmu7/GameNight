@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Home } from "lucide-react";
-import { TRUTHS, DARES } from "./prompts";
+import { TRUTHS, DARES, PACKS } from "./prompts";
 import { usePlayerName } from "../../lib/usePlayerName";
 import { useLanguage } from "../../lib/i18n/LanguageContext";
 
@@ -19,10 +19,18 @@ function pick(arr, excludeIdx = -1) {
   return i;
 }
 
+const CUSTOM_TRUTH_KEY = "wahrheit_custom_truths";
+const CUSTOM_DARE_KEY = "wahrheit_custom_dares";
+function loadCustom(key) {
+  try { return JSON.parse(localStorage.getItem(key) || "[]"); } catch { return []; }
+}
+function saveCustom(key, list) {
+  try { localStorage.setItem(key, JSON.stringify(list)); } catch {}
+}
+
 export default function WahrheitGame({ onExit }) {
-  const { name: myName, setName } = usePlayerName();
+  const { name: myName } = usePlayerName();
   const { lang, t } = useLanguage();
-  const [nameInput, setNameInput] = useState("");
   const [phase, setPhase] = useState("setup"); // setup | picking | choice | reveal
   const [players, setPlayers] = useState(() => [myName || ""]);
   const [current, setCurrent] = useState(null);
@@ -31,6 +39,38 @@ export default function WahrheitGame({ onExit }) {
   const [dareIdx, setDareIdx] = useState(-1);
   const [sips, setSips] = useState({});
   const [spinName, setSpinName] = useState("");
+  const [selectedPacks, setSelectedPacks] = useState(["classic"]);
+  const [customTruths, setCustomTruths] = useState(() => loadCustom(CUSTOM_TRUTH_KEY));
+  const [customDares, setCustomDares] = useState(() => loadCustom(CUSTOM_DARE_KEY));
+  const [customTruthInput, setCustomTruthInput] = useState("");
+  const [customDareInput, setCustomDareInput] = useState("");
+
+  function togglePack(p) {
+    setSelectedPacks(list => list.includes(p) ? (list.length > 1 ? list.filter(x => x !== p) : list) : [...list, p]);
+  }
+  function addCustomTruth() {
+    const text = customTruthInput.trim();
+    if (!text) return;
+    const next = [...customTruths, { pack: "custom", de: text, en: text, es: text }];
+    setCustomTruths(next); saveCustom(CUSTOM_TRUTH_KEY, next); setCustomTruthInput("");
+  }
+  function removeCustomTruth(i) {
+    const next = customTruths.filter((_, idx) => idx !== i);
+    setCustomTruths(next); saveCustom(CUSTOM_TRUTH_KEY, next);
+  }
+  function addCustomDare() {
+    const text = customDareInput.trim();
+    if (!text) return;
+    const next = [...customDares, { pack: "custom", de: text, en: text, es: text }];
+    setCustomDares(next); saveCustom(CUSTOM_DARE_KEY, next); setCustomDareInput("");
+  }
+  function removeCustomDare(i) {
+    const next = customDares.filter((_, idx) => idx !== i);
+    setCustomDares(next); saveCustom(CUSTOM_DARE_KEY, next);
+  }
+
+  const truthPool = [...TRUTHS.filter(p => selectedPacks.includes(p.pack)), ...customTruths];
+  const darePool = [...DARES.filter(p => selectedPacks.includes(p.pack)), ...customDares];
 
   function addPlayer() { setPlayers(p => (p.length >= 12 ? p : [...p, ""])); }
   function updatePlayer(i, v) { setPlayers(p => p.map((x, idx) => (idx === i ? v : x))); }
@@ -62,8 +102,8 @@ export default function WahrheitGame({ onExit }) {
 
   function choose(m) {
     setMode(m);
-    if (m === "truth") { const i = pick(TRUTHS, truthIdx); setTruthIdx(i); }
-    else { const i = pick(DARES, dareIdx); setDareIdx(i); }
+    if (m === "truth") { const i = pick(truthPool, truthIdx); setTruthIdx(i); }
+    else { const i = pick(darePool, dareIdx); setDareIdx(i); }
     setPhase("reveal");
   }
 
@@ -86,17 +126,63 @@ export default function WahrheitGame({ onExit }) {
           <div className="rounded-[34px] border border-white/10 bg-black/45 backdrop-blur-2xl p-6 space-y-6 text-center">
             <div className="text-5xl">🎯</div>
             <h1 className="text-4xl font-black tracking-tight">{t("wahrheit.title")}</h1>
-            <p className="text-sm text-white/60">{TRUTHS.length} {t("wahrheit.subtitle")} · {DARES.length} {t("wahrheit.dares.subtitle")}</p>
+            <p className="text-sm text-white/60">{truthPool.length} {t("wahrheit.subtitle")} · {darePool.length} {t("wahrheit.dares.subtitle")}</p>
 
-            {!myName && (
-              <div className="rounded-[26px] bg-white/5 border border-white/10 p-4 space-y-3 text-left">
-                <div className="text-center text-sm font-black text-white/70">{t("niemals.name.title")}</div>
-                <input value={nameInput} onChange={e => setNameInput(e.target.value)} placeholder={t("hub.name.placeholder")}
-                  className="w-full rounded-2xl border border-white/10 bg-black/40 px-5 py-4 text-center text-white font-black outline-none text-lg" />
-                <Btn onClick={() => { setName(nameInput); setPlayers(p => (p[0] ? p : [nameInput])); }} disabled={!nameInput.trim()}
-                  className="w-full rounded-[20px] py-3 font-black bg-white text-black disabled:opacity-40">{t("niemals.confirm")}</Btn>
+            <div className="space-y-2 text-left">
+              <div className="text-sm font-black text-white/60 text-center">{t("wahrheit.packs.title")}</div>
+              <div className="flex flex-wrap gap-2 justify-center">
+                {PACKS.map(p => (
+                  <Btn key={p} onClick={() => togglePack(p)}
+                    className={`rounded-full px-4 py-2 text-xs font-black border ${selectedPacks.includes(p) ? "bg-white text-black border-white" : "bg-white/5 text-white/60 border-white/10"}`}>
+                    {t(`pack.${p}`)}
+                  </Btn>
+                ))}
               </div>
-            )}
+            </div>
+
+            <div className="space-y-2 text-left">
+              <div className="text-sm font-black text-white/60 text-center">{t("wahrheit.custom.truth.title")}</div>
+              <div className="flex gap-2">
+                <input value={customTruthInput} onChange={e => setCustomTruthInput(e.target.value)}
+                  onKeyDown={e => { if (e.key === "Enter") addCustomTruth(); }}
+                  placeholder={t("wahrheit.custom.truth.placeholder")}
+                  className="flex-1 rounded-[18px] border border-white/10 bg-white/5 px-4 py-3 text-sm font-semibold outline-none" />
+                <Btn onClick={addCustomTruth} className="px-4 rounded-[18px] bg-white/10 border border-white/10 font-black text-sm">{t("wahrheit.custom.add")}</Btn>
+              </div>
+              {customTruths.length > 0 && (
+                <div className="space-y-1.5">
+                  {customTruths.map((c, i) => (
+                    <div key={i} className="flex items-center gap-2 rounded-2xl bg-white/5 border border-white/10 px-3 py-2">
+                      <span className="text-[9px] font-black uppercase tracking-widest text-amber-300">{t("wahrheit.custom.badge")}</span>
+                      <span className="flex-1 text-sm font-semibold text-left">{c.de}</span>
+                      <Btn onClick={() => removeCustomTruth(i)} className="px-2 rounded-lg bg-white/10 text-xs">✕</Btn>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="space-y-2 text-left">
+              <div className="text-sm font-black text-white/60 text-center">{t("wahrheit.custom.dare.title")}</div>
+              <div className="flex gap-2">
+                <input value={customDareInput} onChange={e => setCustomDareInput(e.target.value)}
+                  onKeyDown={e => { if (e.key === "Enter") addCustomDare(); }}
+                  placeholder={t("wahrheit.custom.dare.placeholder")}
+                  className="flex-1 rounded-[18px] border border-white/10 bg-white/5 px-4 py-3 text-sm font-semibold outline-none" />
+                <Btn onClick={addCustomDare} className="px-4 rounded-[18px] bg-white/10 border border-white/10 font-black text-sm">{t("wahrheit.custom.add")}</Btn>
+              </div>
+              {customDares.length > 0 && (
+                <div className="space-y-1.5">
+                  {customDares.map((c, i) => (
+                    <div key={i} className="flex items-center gap-2 rounded-2xl bg-white/5 border border-white/10 px-3 py-2">
+                      <span className="text-[9px] font-black uppercase tracking-widest text-amber-300">{t("wahrheit.custom.badge")}</span>
+                      <span className="flex-1 text-sm font-semibold text-left">{c.de}</span>
+                      <Btn onClick={() => removeCustomDare(i)} className="px-2 rounded-lg bg-white/10 text-xs">✕</Btn>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
 
             <div className="space-y-3 text-left">
               <div className="text-lg font-black text-center">{t("wahrheit.players.title")}</div>
@@ -158,7 +244,7 @@ export default function WahrheitGame({ onExit }) {
             <motion.div key="reveal" initial={{ opacity: 0, scale: 0.92 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }}
               className="rounded-[36px] border-4 border-white/70 bg-zinc-950 p-8 text-center space-y-6">
               <div className="text-xs uppercase tracking-widest text-white/40 font-black">{current} · {mode === "truth" ? t("wahrheit.truth") : t("wahrheit.dare")}</div>
-              <div className="text-xl font-black leading-snug">{mode === "truth" ? TRUTHS[truthIdx][lang] : DARES[dareIdx][lang]}</div>
+              <div className="text-xl font-black leading-snug">{mode === "truth" ? truthPool[truthIdx]?.[lang] : darePool[dareIdx]?.[lang]}</div>
               <div className="grid grid-cols-2 gap-3">
                 <Btn onClick={refuse} className="rounded-[22px] py-5 font-black bg-white/10 border border-white/10">{t("wahrheit.refuse")}</Btn>
                 <Btn onClick={done} className="rounded-[22px] py-5 font-black bg-white text-black">{t("wahrheit.done")}</Btn>
