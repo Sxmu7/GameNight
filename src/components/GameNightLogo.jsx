@@ -30,26 +30,29 @@ export default function GameNightLogo({ size = 220, animated = true }) {
         variants={ring}
       />
 
-      <motion.g variants={pop(0.25)} transform="translate(190,150) rotate(-14)">
-        <rect x="-42" y="-58" width="84" height="118" rx="10" fill="#fff" />
-        <text x="-32" y="-30" fontFamily="Georgia, serif" fontSize="26" fontWeight="700" fill="#000">A</text>
-        <text x="-24" y="14" fontFamily="Arial" fontSize="40" fill="#000">♠</text>
+      <motion.g variants={pop(0.25)} transform="translate(186,168) rotate(-13)">
+        <rect x="-46" y="-64" width="92" height="130" rx="12" fill="#fff" />
+        <text x="-33" y="-32" fontFamily="Georgia, serif" fontSize="30" fontWeight="700" fill="#111">A</text>
+        <text x="-30" y="34" fontFamily="Arial" fontSize="58" fill="#111">♠</text>
       </motion.g>
 
-      <motion.g variants={pop(0.4)} transform="translate(266,146) rotate(10)">
-        <rect x="-42" y="-58" width="84" height="118" rx="10" fill="#fff" />
-        <text x="-32" y="-30" fontFamily="Georgia, serif" fontSize="26" fontWeight="700" fill="#D42A2A">A</text>
-        <text x="-24" y="16" fontFamily="Arial" fontSize="40" fill="#D42A2A">♥</text>
+      <motion.g variants={pop(0.4)} transform="translate(272,164) rotate(11)">
+        <rect x="-46" y="-64" width="92" height="130" rx="12" fill="#fff" />
+        <text x="-33" y="-32" fontFamily="Georgia, serif" fontSize="30" fontWeight="700" fill="#D42A2A">A</text>
+        <text x="-31" y="36" fontFamily="Arial" fontSize="58" fill="#D42A2A">♥</text>
       </motion.g>
 
-      <motion.g variants={pop(0.55)} transform="translate(228,300)">
-        <path d="M -46 -34 L 46 -34 L 4 22 L 4 58 L 26 58 L 26 68 L -26 68 L -26 58 L -4 58 L -4 22 Z" fill="none" stroke="#D4AF37" strokeWidth="7" strokeLinejoin="round" />
+      {/* Martini — solid gold fill, black outline, like the reference badge */}
+      <motion.g variants={pop(0.55)} transform="translate(226,318)">
+        <path d="M -48 -36 L 48 -36 L 6 24 L 6 62 L 30 62 L 30 74 L -30 74 L -30 62 L -6 62 L -6 24 Z"
+          fill="#D4AF37" stroke="#0A0A0A" strokeWidth="8" strokeLinejoin="round" />
       </motion.g>
 
-      <motion.g variants={pop(0.65)} transform="translate(330,300)">
-        <path d="M -30 -46 L 30 -46 L 26 60 L -26 60 Z" fill="none" stroke="#D4AF37" strokeWidth="7" strokeLinejoin="round" />
-        <path d="M -30 -30 Q -6 -10 -30 8" fill="none" stroke="#D4AF37" strokeWidth="6" />
-        <ellipse cx="0" cy="-46" rx="30" ry="8" fill="#D4AF37" />
+      {/* Beer — solid gold body, black outline, white foam cap */}
+      <motion.g variants={pop(0.65)} transform="translate(332,312)">
+        <path d="M -32 -34 L 32 -34 L 27 64 L -27 64 Z" fill="#D4AF37" stroke="#0A0A0A" strokeWidth="8" strokeLinejoin="round" />
+        <path d="M -30 -18 Q -4 2 -30 22" fill="none" stroke="#0A0A0A" strokeWidth="5" strokeLinecap="round" opacity="0.35" />
+        <path d="M -34 -34 Q 0 -50 34 -34 Q 34 -20 0 -22 Q -34 -20 -34 -34 Z" fill="#fff" stroke="#0A0A0A" strokeWidth="6" strokeLinejoin="round" />
       </motion.g>
 
       <motion.g
