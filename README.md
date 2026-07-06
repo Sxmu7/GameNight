@@ -7,8 +7,9 @@ Vite + React + Tailwind + Framer Motion + Firebase Realtime Database.
 - **Intro:** animiertes, nachgebautes "GAME NIGHT"-Logo (SVG, kein Platzhalter) als Splash-Screen.
 - **Hub / Landing Page:** merkt den Spielernamen dauerhaft auf dem Gerät (`localStorage`), zeigt eine saubere Spielauswahl.
 - **ANLEGEN:** vollständiges Höher/Tiefer/Gleich-Kartenspiel — Klassisch- und Party-Modi (Hardcore, Speed, Chaos, Teams, Last Man, Random, Storage, Turm), Extreme-Deck, Getränke-Auswahl, echte Firebase-Online-Lobby mit Raumcode/QR, Bluetooth-Lokal-Lobby, Regeln & Statistik-Screens.
-- **Ich hab noch nie:** 30 kuratierte Karten (Mild/Spicy), lokal oder online über eine eigene Firebase-Lobby.
-- **Wahrheit oder Pflicht:** 15 echte Wahrheitsfragen, 15 echte Aufgaben, Zufallsauswahl des Spielers.
+- **Ich hab noch nie:** 40 kuratierte Karten (20 Mild / 20 Spicy), lokal oder online über eine eigene Firebase-Lobby.
+- **Wahrheit oder Pflicht:** 20 echte Wahrheitsfragen, 20 echte Aufgaben, Zufallsauswahl des Spielers.
+- **Sprachen:** Hub, "Ich hab noch nie" und "Wahrheit oder Pflicht" sind komplett auf Deutsch/Englisch/Spanisch spielbar, jederzeit umschaltbar über den Sprach-Switch im Hub (persistiert lokal). ANLEGEN selbst bleibt vorerst Deutsch — seine ~1000 Zeilen Regel-/UI-Text sind ein eigener Übersetzungs-Task.
 
 Alle drei Spiele sind vollständig spielbar — keine "Platzhalter"-Karten mehr.
 

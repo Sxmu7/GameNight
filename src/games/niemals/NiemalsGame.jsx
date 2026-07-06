@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Home, Wifi, Shuffle } from "lucide-react";
 import { NIEMALS_PROMPTS } from "./prompts";
 import { usePlayerName, getOrCreatePlayerId } from "../../lib/usePlayerName";
+import { useLanguage } from "../../lib/i18n/LanguageContext";
 import {
   genRoomCode, createRoom, roomExists, joinLobby, leaveLobby,
   startRoomGame, writeRoomState, subscribeRoom,
@@ -27,6 +28,7 @@ function shuffle(arr) {
 
 export default function NiemalsGame({ onExit }) {
   const { name: myName, setName } = usePlayerName();
+  const { lang, t } = useLanguage();
   const [playerId] = useState(getOrCreatePlayerId);
   const [nameInput, setNameInput] = useState("");
 
@@ -72,7 +74,7 @@ export default function NiemalsGame({ onExit }) {
     if (!code || !myName.trim()) return;
     setJoining(true); setJoinErr("");
     const res = await roomExists(GAME_KEY, code);
-    if (!res.ok) { setJoinErr("Raum nicht gefunden."); setJoining(false); return; }
+    if (!res.ok) { setJoinErr(t("niemals.online.notfound")); setJoining(false); return; }
     await joinLobby(GAME_KEY, code, playerId, myName);
     setRoom(code); setIsHost(false); setOnline(true); setPhase("online-lobby");
     setJoining(false);
@@ -122,51 +124,51 @@ export default function NiemalsGame({ onExit }) {
       <div className="fixed inset-0 bg-black text-white font-sans overflow-y-auto" style={{ WebkitOverflowScrolling: "touch" }}>
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.08),transparent_45%)]" />
         <div className="mx-auto max-w-md space-y-4 relative z-10 p-5 pt-8">
-          <Btn onClick={onExit} className="rounded-2xl bg-white/10 px-4 py-3 text-sm font-black flex items-center gap-2"><Home size={16} />Übersicht</Btn>
+          <Btn onClick={onExit} className="rounded-2xl bg-white/10 px-4 py-3 text-sm font-black flex items-center gap-2"><Home size={16} />{t("niemals.overview")}</Btn>
 
           <div className="rounded-[34px] border border-white/10 bg-black/45 backdrop-blur-2xl p-6 space-y-6 text-center">
             <div className="text-5xl">🥴</div>
-            <h1 className="text-4xl font-black tracking-tight">Ich hab noch nie</h1>
-            <p className="text-sm text-white/60">Wer's getan hat, trinkt. {NIEMALS_PROMPTS.length} echte Karten, keine Platzhalter.</p>
+            <h1 className="text-4xl font-black tracking-tight">{t("niemals.title")}</h1>
+            <p className="text-sm text-white/60">{NIEMALS_PROMPTS.length} {t("niemals.subtitle")}</p>
 
             <div className="flex rounded-2xl border border-white/10 overflow-hidden">
-              <Btn onClick={() => setIncludeSpicy(false)} className={`flex-1 py-3 text-sm font-black ${!includeSpicy ? "bg-white text-black" : "bg-white/5 text-white/60"}`}>Nur Mild</Btn>
-              <Btn onClick={() => setIncludeSpicy(true)} className={`flex-1 py-3 text-sm font-black ${includeSpicy ? "bg-white text-black" : "bg-white/5 text-white/60"}`}>Mild + Spicy</Btn>
+              <Btn onClick={() => setIncludeSpicy(false)} className={`flex-1 py-3 text-sm font-black ${!includeSpicy ? "bg-white text-black" : "bg-white/5 text-white/60"}`}>{t("niemals.filter.mild")}</Btn>
+              <Btn onClick={() => setIncludeSpicy(true)} className={`flex-1 py-3 text-sm font-black ${includeSpicy ? "bg-white text-black" : "bg-white/5 text-white/60"}`}>{t("niemals.filter.all")}</Btn>
             </div>
 
             {!myName && (
               <div className="rounded-[26px] bg-white/5 border border-white/10 p-4 space-y-3 text-left">
-                <div className="text-center text-sm font-black text-white/70">Dein Name (wird gemerkt)</div>
-                <input value={nameInput} onChange={e => setNameInput(e.target.value)} placeholder="Name eingeben…"
+                <div className="text-center text-sm font-black text-white/70">{t("niemals.name.title")}</div>
+                <input value={nameInput} onChange={e => setNameInput(e.target.value)} placeholder={t("hub.name.placeholder")}
                   className="w-full rounded-2xl border border-white/10 bg-black/40 px-5 py-4 text-center text-white font-black outline-none text-lg" />
                 <Btn onClick={() => { setName(nameInput); setPlayers(p => (p[0] ? p : [nameInput])); }} disabled={!nameInput.trim()}
-                  className="w-full rounded-[20px] py-3 font-black bg-white text-black disabled:opacity-40">Bestätigen</Btn>
+                  className="w-full rounded-[20px] py-3 font-black bg-white text-black disabled:opacity-40">{t("niemals.confirm")}</Btn>
               </div>
             )}
 
             <div className="space-y-3 text-left">
-              <div className="text-lg font-black text-center">Lokal: Spieler</div>
+              <div className="text-lg font-black text-center">{t("niemals.players.title")}</div>
               {players.map((p, i) => (
                 <div key={i} className="flex gap-2">
-                  <input value={p} onChange={e => updatePlayer(i, e.target.value)} placeholder={`Spieler ${i + 1}`}
+                  <input value={p} onChange={e => updatePlayer(i, e.target.value)} placeholder={`${t("niemals.player.placeholder")} ${i + 1}`}
                     className="flex-1 rounded-[18px] border border-white/10 bg-white/5 px-4 py-3 font-semibold text-center outline-none" />
                   {players.length > 1 && <Btn onClick={() => removePlayer(i)} className="px-3 rounded-[18px] bg-white/10">✕</Btn>}
                 </div>
               ))}
-              <Btn onClick={addPlayer} className="w-full rounded-[18px] py-3 font-black bg-white/5 border border-white/10 text-white/70">+ Spieler</Btn>
+              <Btn onClick={addPlayer} className="w-full rounded-[18px] py-3 font-black bg-white/5 border border-white/10 text-white/70">{t("niemals.add.player")}</Btn>
             </div>
 
             <Btn onClick={startLocal} disabled={players.filter(Boolean).length < 2}
-              className="w-full rounded-[26px] py-6 text-lg font-black bg-white text-black disabled:opacity-40">▶ Lokal starten</Btn>
+              className="w-full rounded-[26px] py-6 text-lg font-black bg-white text-black disabled:opacity-40">{t("niemals.start.local")}</Btn>
 
             <div className="border-t border-white/10 pt-5 space-y-3">
-              <div className="text-sm font-black text-white/60 flex items-center justify-center gap-2"><Wifi size={16} />Online (jeder auf eigenem Gerät)</div>
-              <Btn onClick={handleCreateOnline} disabled={!myName.trim()} className="w-full rounded-[22px] py-4 font-black bg-white/10 border border-white/10 disabled:opacity-40">Raum erstellen</Btn>
+              <div className="text-sm font-black text-white/60 flex items-center justify-center gap-2"><Wifi size={16} />{t("niemals.online.title")}</div>
+              <Btn onClick={handleCreateOnline} disabled={!myName.trim()} className="w-full rounded-[22px] py-4 font-black bg-white/10 border border-white/10 disabled:opacity-40">{t("niemals.online.create")}</Btn>
               <div className="flex gap-2">
                 <input value={joinCode} onChange={e => setJoinCode(e.target.value.toUpperCase())} placeholder="NIE-XXXX"
                   className="flex-1 rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-center font-black tracking-widest outline-none" />
                 <Btn onClick={handleJoinOnline} disabled={!myName.trim() || joining} className="px-5 rounded-2xl bg-white/10 border border-white/10 font-black disabled:opacity-40">
-                  {joining ? "…" : "Beitreten"}
+                  {joining ? t("niemals.online.joining") : t("niemals.online.join")}
                 </Btn>
               </div>
               {joinErr && <div className="text-red-300 text-sm font-bold">{joinErr}</div>}
@@ -182,9 +184,9 @@ export default function NiemalsGame({ onExit }) {
     return (
       <div className="fixed inset-0 bg-black text-white font-sans overflow-y-auto" style={{ WebkitOverflowScrolling: "touch" }}>
         <div className="mx-auto max-w-md space-y-4 relative z-10 p-5 pt-8">
-          <Btn onClick={onExit} className="rounded-2xl bg-white/10 px-4 py-3 text-sm font-black flex items-center gap-2"><Home size={16} />Übersicht</Btn>
+          <Btn onClick={onExit} className="rounded-2xl bg-white/10 px-4 py-3 text-sm font-black flex items-center gap-2"><Home size={16} />{t("niemals.overview")}</Btn>
           <div className="rounded-[34px] border border-white/10 bg-black/45 backdrop-blur-2xl p-6 space-y-5 text-center">
-            <div className="text-xs uppercase tracking-[0.3em] text-white/40 font-black">Raum-Code</div>
+            <div className="text-xs uppercase tracking-[0.3em] text-white/40 font-black">{t("niemals.lobby.code")}</div>
             <div className="text-5xl font-black tracking-widest text-white">{room}</div>
             <div className="space-y-2">
               {lobby.map((p, i) => (
@@ -192,12 +194,12 @@ export default function NiemalsGame({ onExit }) {
                   <span>{i === 0 ? "👑" : "👤"}</span><span className="font-black flex-1 text-left">{p.name}</span>
                 </div>
               ))}
-              {lobby.length < 2 && <div className="text-xs text-white/30">Warte auf weitere Spieler…</div>}
+              {lobby.length < 2 && <div className="text-xs text-white/30">{t("niemals.lobby.waiting")}</div>}
             </div>
             {isHost ? (
-              <Btn onClick={handleStartOnlineGame} disabled={lobby.length < 2} className="w-full rounded-[26px] py-6 font-black bg-white text-black disabled:opacity-40">▶ Spiel starten</Btn>
+              <Btn onClick={handleStartOnlineGame} disabled={lobby.length < 2} className="w-full rounded-[26px] py-6 font-black bg-white text-black disabled:opacity-40">{t("niemals.lobby.start")}</Btn>
             ) : (
-              <div className="text-white/50 font-black text-sm">⏳ Host startet gleich…</div>
+              <div className="text-white/50 font-black text-sm">{t("niemals.lobby.hostwait")}</div>
             )}
           </div>
         </div>
@@ -211,7 +213,7 @@ export default function NiemalsGame({ onExit }) {
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.08),transparent_45%)]" />
       <div className="mx-auto max-w-md space-y-4 relative z-10 p-5 pt-8">
         <div className="flex gap-2">
-          <Btn onClick={onExit} className="flex-1 rounded-2xl bg-white/10 py-4 text-sm font-black flex items-center justify-center gap-2"><Home size={16} />Übersicht</Btn>
+          <Btn onClick={onExit} className="flex-1 rounded-2xl bg-white/10 py-4 text-sm font-black flex items-center justify-center gap-2"><Home size={16} />{t("niemals.overview")}</Btn>
           {(!online || isHost) && (
             <Btn onClick={() => { const d = buildDeck(); setDeck(d); setIndex(0); if (online) syncState({ deck: d, index: 0 }); }}
               className="rounded-2xl bg-white/10 px-4 py-4"><Shuffle size={18} /></Btn>
@@ -219,7 +221,7 @@ export default function NiemalsGame({ onExit }) {
         </div>
 
         <div className="text-center text-xs font-black uppercase tracking-widest text-white/40">
-          Karte {Math.min(index + 1, deck.length)} / {deck.length}
+          {t("niemals.card.count")} {Math.min(index + 1, deck.length)} / {deck.length}
         </div>
 
         <div className="relative h-72">
@@ -234,14 +236,14 @@ export default function NiemalsGame({ onExit }) {
               className="absolute inset-0 rounded-[36px] border-4 border-white/70 bg-zinc-950 p-7 flex flex-col items-center justify-center text-center shadow-2xl"
             >
               <div className="text-5xl mb-4">🍻</div>
-              <div className="text-xl font-black leading-snug">Ich hab noch nie{card?.text}</div>
-              {card?.cat === "spicy" && <div className="mt-4 text-[10px] font-black uppercase tracking-widest text-amber-300">Spicy</div>}
+              <div className="text-xl font-black leading-snug">{t("niemals.prefix")}{card?.[lang]}</div>
+              {card?.cat === "spicy" && <div className="mt-4 text-[10px] font-black uppercase tracking-widest text-amber-300">{t("niemals.spicy.badge")}</div>}
             </motion.div>
           </AnimatePresence>
         </div>
 
         <div className="rounded-[30px] border border-white/10 bg-black/45 backdrop-blur-2xl p-4">
-          <div className="text-xs font-black text-white/50 uppercase tracking-widest mb-2 text-center">Wer hat's getan? Tippen zum Trinken</div>
+          <div className="text-xs font-black text-white/50 uppercase tracking-widest mb-2 text-center">{t("niemals.whodid")}</div>
           <div className="grid grid-cols-2 gap-2">
             {allNames.map(n => (
               <Btn key={n} onClick={() => markDrunk(n)} className="rounded-2xl bg-white/10 border border-white/10 px-3 py-3 text-sm font-black flex flex-col items-center gap-1">
@@ -254,7 +256,7 @@ export default function NiemalsGame({ onExit }) {
         {(!online || isHost) && (
           <Btn onClick={next} disabled={index >= deck.length - 1}
             className="w-full rounded-[26px] py-6 text-lg font-black bg-white text-black disabled:opacity-40">
-            {index >= deck.length - 1 ? "Letzte Karte" : "Nächste Karte →"}
+            {index >= deck.length - 1 ? t("niemals.last") : t("niemals.next")}
           </Btn>
         )}
       </div>

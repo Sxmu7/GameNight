@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Home } from "lucide-react";
 import { TRUTHS, DARES } from "./prompts";
 import { usePlayerName } from "../../lib/usePlayerName";
+import { useLanguage } from "../../lib/i18n/LanguageContext";
 
 function Btn({ children, className = "", ...props }) {
   return (
@@ -20,6 +21,7 @@ function pick(arr, excludeIdx = -1) {
 
 export default function WahrheitGame({ onExit }) {
   const { name: myName, setName } = usePlayerName();
+  const { lang, t } = useLanguage();
   const [nameInput, setNameInput] = useState("");
   const [phase, setPhase] = useState("setup"); // setup | picking | choice | reveal
   const [players, setPlayers] = useState(() => [myName || ""]);
@@ -80,36 +82,36 @@ export default function WahrheitGame({ onExit }) {
       <div className="fixed inset-0 bg-black text-white font-sans overflow-y-auto" style={{ WebkitOverflowScrolling: "touch" }}>
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.08),transparent_45%)]" />
         <div className="mx-auto max-w-md space-y-4 relative z-10 p-5 pt-8">
-          <Btn onClick={onExit} className="rounded-2xl bg-white/10 px-4 py-3 text-sm font-black flex items-center gap-2"><Home size={16} />Übersicht</Btn>
+          <Btn onClick={onExit} className="rounded-2xl bg-white/10 px-4 py-3 text-sm font-black flex items-center gap-2"><Home size={16} />{t("wahrheit.overview")}</Btn>
           <div className="rounded-[34px] border border-white/10 bg-black/45 backdrop-blur-2xl p-6 space-y-6 text-center">
             <div className="text-5xl">🎯</div>
-            <h1 className="text-4xl font-black tracking-tight">Wahrheit oder Pflicht</h1>
-            <p className="text-sm text-white/60">{TRUTHS.length} echte Wahrheitsfragen · {DARES.length} echte Aufgaben.</p>
+            <h1 className="text-4xl font-black tracking-tight">{t("wahrheit.title")}</h1>
+            <p className="text-sm text-white/60">{TRUTHS.length} {t("wahrheit.subtitle")} · {DARES.length} {t("wahrheit.dares.subtitle")}</p>
 
             {!myName && (
               <div className="rounded-[26px] bg-white/5 border border-white/10 p-4 space-y-3 text-left">
-                <div className="text-center text-sm font-black text-white/70">Dein Name (wird gemerkt)</div>
-                <input value={nameInput} onChange={e => setNameInput(e.target.value)} placeholder="Name eingeben…"
+                <div className="text-center text-sm font-black text-white/70">{t("niemals.name.title")}</div>
+                <input value={nameInput} onChange={e => setNameInput(e.target.value)} placeholder={t("hub.name.placeholder")}
                   className="w-full rounded-2xl border border-white/10 bg-black/40 px-5 py-4 text-center text-white font-black outline-none text-lg" />
                 <Btn onClick={() => { setName(nameInput); setPlayers(p => (p[0] ? p : [nameInput])); }} disabled={!nameInput.trim()}
-                  className="w-full rounded-[20px] py-3 font-black bg-white text-black disabled:opacity-40">Bestätigen</Btn>
+                  className="w-full rounded-[20px] py-3 font-black bg-white text-black disabled:opacity-40">{t("niemals.confirm")}</Btn>
               </div>
             )}
 
             <div className="space-y-3 text-left">
-              <div className="text-lg font-black text-center">Spieler</div>
+              <div className="text-lg font-black text-center">{t("wahrheit.players.title")}</div>
               {players.map((p, i) => (
                 <div key={i} className="flex gap-2">
-                  <input value={p} onChange={e => updatePlayer(i, e.target.value)} placeholder={`Spieler ${i + 1}`}
+                  <input value={p} onChange={e => updatePlayer(i, e.target.value)} placeholder={`${t("niemals.player.placeholder")} ${i + 1}`}
                     className="flex-1 rounded-[18px] border border-white/10 bg-white/5 px-4 py-3 font-semibold text-center outline-none" />
                   {players.length > 1 && <Btn onClick={() => removePlayer(i)} className="px-3 rounded-[18px] bg-white/10">✕</Btn>}
                 </div>
               ))}
-              <Btn onClick={addPlayer} className="w-full rounded-[18px] py-3 font-black bg-white/5 border border-white/10 text-white/70">+ Spieler</Btn>
+              <Btn onClick={addPlayer} className="w-full rounded-[18px] py-3 font-black bg-white/5 border border-white/10 text-white/70">{t("niemals.add.player")}</Btn>
             </div>
 
             <Btn onClick={startGame} disabled={names.length < 2}
-              className="w-full rounded-[26px] py-6 text-lg font-black bg-white text-black disabled:opacity-40">▶ Spiel starten</Btn>
+              className="w-full rounded-[26px] py-6 text-lg font-black bg-white text-black disabled:opacity-40">{t("wahrheit.start")}</Btn>
           </div>
         </div>
       </div>
@@ -120,7 +122,7 @@ export default function WahrheitGame({ onExit }) {
     <div className="fixed inset-0 bg-black text-white font-sans overflow-y-auto" style={{ WebkitOverflowScrolling: "touch" }}>
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.08),transparent_45%)]" />
       <div className="mx-auto max-w-md space-y-4 relative z-10 p-5 pt-8">
-        <Btn onClick={onExit} className="rounded-2xl bg-white/10 px-4 py-3 text-sm font-black flex items-center gap-2"><Home size={16} />Übersicht</Btn>
+        <Btn onClick={onExit} className="rounded-2xl bg-white/10 px-4 py-3 text-sm font-black flex items-center gap-2"><Home size={16} />{t("wahrheit.overview")}</Btn>
 
         <div className="rounded-[30px] border border-white/10 bg-black/45 backdrop-blur-2xl p-3">
           <div className="grid grid-cols-2 gap-2">
@@ -136,7 +138,7 @@ export default function WahrheitGame({ onExit }) {
           {phase === "picking" && (
             <motion.div key="picking" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }}
               className="rounded-[36px] border-4 border-white/70 bg-zinc-950 p-10 text-center space-y-3">
-              <div className="text-xs uppercase tracking-widest text-white/40 font-black">ist dran…</div>
+              <div className="text-xs uppercase tracking-widest text-white/40 font-black">{t("wahrheit.picking")}</div>
               <div className="text-4xl font-black">{spinName}</div>
             </motion.div>
           )}
@@ -146,8 +148,8 @@ export default function WahrheitGame({ onExit }) {
               className="rounded-[36px] border-4 border-white/70 bg-zinc-950 p-8 text-center space-y-6">
               <div className="text-3xl font-black">{current}</div>
               <div className="grid grid-cols-2 gap-3">
-                <Btn onClick={() => choose("truth")} className="rounded-[24px] py-8 font-black bg-white text-black text-lg">Wahrheit</Btn>
-                <Btn onClick={() => choose("dare")} className="rounded-[24px] py-8 font-black bg-white/10 border border-white/10 text-lg">Pflicht</Btn>
+                <Btn onClick={() => choose("truth")} className="rounded-[24px] py-8 font-black bg-white text-black text-lg">{t("wahrheit.truth")}</Btn>
+                <Btn onClick={() => choose("dare")} className="rounded-[24px] py-8 font-black bg-white/10 border border-white/10 text-lg">{t("wahrheit.dare")}</Btn>
               </div>
             </motion.div>
           )}
@@ -155,11 +157,11 @@ export default function WahrheitGame({ onExit }) {
           {phase === "reveal" && (
             <motion.div key="reveal" initial={{ opacity: 0, scale: 0.92 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }}
               className="rounded-[36px] border-4 border-white/70 bg-zinc-950 p-8 text-center space-y-6">
-              <div className="text-xs uppercase tracking-widest text-white/40 font-black">{current} · {mode === "truth" ? "Wahrheit" : "Pflicht"}</div>
-              <div className="text-xl font-black leading-snug">{mode === "truth" ? TRUTHS[truthIdx] : DARES[dareIdx]}</div>
+              <div className="text-xs uppercase tracking-widest text-white/40 font-black">{current} · {mode === "truth" ? t("wahrheit.truth") : t("wahrheit.dare")}</div>
+              <div className="text-xl font-black leading-snug">{mode === "truth" ? TRUTHS[truthIdx][lang] : DARES[dareIdx][lang]}</div>
               <div className="grid grid-cols-2 gap-3">
-                <Btn onClick={refuse} className="rounded-[22px] py-5 font-black bg-white/10 border border-white/10">Verweigert → trinkt</Btn>
-                <Btn onClick={done} className="rounded-[22px] py-5 font-black bg-white text-black">Erledigt →</Btn>
+                <Btn onClick={refuse} className="rounded-[22px] py-5 font-black bg-white/10 border border-white/10">{t("wahrheit.refuse")}</Btn>
+                <Btn onClick={done} className="rounded-[22px] py-5 font-black bg-white text-black">{t("wahrheit.done")}</Btn>
               </div>
             </motion.div>
           )}
